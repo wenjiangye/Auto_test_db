@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1		编写			创建			孙峰		2008-3-14						
+-->
+<!--
+	测试点列表
+	1.用来示范TEMPSQL的使用
+-->
+<SQLTEST>
+	<CONTENT> 用来示范TEMPSQL的使用 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<!-- +++++++++++++++++++++ 测试点1：开始 +++++++++++++++++++++ -->
+	<SQL_CASE><!-- 嵌套50层 -->
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE>
+		<SQL> DROP TABLE OBJTYPE_T_010003 CASCADE; </SQL>	
+		<SQLSTR1>50</SQLSTR1><!-- 如果想改动测试嵌套的层数，只要在这里面修改就可以了 -->
+		<LOOP>
+			<NOSHOW></NOSHOW>
+			<TIMES>@SQLSTR1</TIMES>
+			<STARTTIMES>-1</STARTTIMES><!-- 从OBJTYPE_010003_1024开始往下删，因为嵌套的时候是从小住大套的 -->
+			<SQL> DROP TYPE OBJTYPE_010003_@TIMES </SQL>			
+		</LOOP>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE>
+		<SQL> CREATE TYPE OBJTYPE_010003_1 AS OBJECT(A INT); </SQL><!-- 最低层的对像类型 -->
+		<SQLSTR></SQLSTR><!-- 清空原来保存的值 -->
+		<SQLSTR>1</SQLSTR><!-- 初努化最底层的计数为1 -->
+		<LOOP>
+			<TIMES>@SQLSTR1</TIMES>
+			<STARTTIMES>2</STARTTIMES>
+			<SQL> CREATE TYPE OBJTYPE_010003_@TIMES AS OBJECT(A OBJTYPE_010003_@SQLSTR); </SQL>
+			<SQLSTR></SQLSTR><!-- 清空原来保存的值 -->
+			<SQLSTR>@TIMES</SQLSTR><!-- 保存这一次的值，留给下一层套用 -->						
+		</LOOP>
+		<SQL> CREATE TABLE OBJTYPE_T_010003(C OBJTYPE_010003_@SQLSTR1) </SQL>
+		<!-- 插入一行试下 -->
+		<SQLSTR></SQLSTR><!-- 清空原来保存的值 -->		
+		<TEMPSTR></TEMPSTR><!-- 清空原来保存的值 -->
+		<TEMPSTR>INSERT INTO OBJTYPE_T_010003(C) VALUES(@TEMPSTR);</TEMPSTR>
+		<SQLSTR>@TEMPSTR</SQLSTR>
+		<LOOP><!-- 构造插入语句 -->
+			<TIMES>@SQLSTR1</TIMES>
+			<STARTTIMES>-1</STARTTIMES><!-- 从OBJTYPE_010003_1024开始往下删，因为嵌套的时候是从小住大套的 -->
+			<TEMPSTR></TEMPSTR><!-- 清空原来保存的值 -->
+			<TEMPSTR>OBJTYPE_010003_@TIMES(@TEMPSTR)</TEMPSTR><!-- 清空原来保存的值 -->
+			<SQLSTR>@</SQLSTR><!-- 在内部执行一次替代 -->		
+		</LOOP>
+		<TEMPSTR></TEMPSTR><!-- 清空原来保存的值 -->
+		<TEMPSTR>100</TEMPSTR><!-- 清空原来保存的值 -->
+		<SQLSTR>@</SQLSTR><!-- 在内部执行一次替代 -->
+		<SQL>@SQLSTR</SQL>		
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

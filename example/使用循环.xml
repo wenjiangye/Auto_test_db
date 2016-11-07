@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+																	
+-->
+<!--
+	测试点列表
+	1.		
+-->
+<SQLTEST>
+	<CONTENT>LOOP, STARTTIMES </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<!-- +++++++++++++++++++++ 测试点1：开始 +++++++++++++++++++++ -->
+	<SQL_CASE>
+	<LOOP> <!-- 这个节点执行完毕以后将创建10个表，分别是：T1,D1,T2,D2,T3,D3,T4,D4,T5,D5 -->
+		<TIMES>5</TIMES>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE>
+		<SQL> DROP TABLE T@TIMES; </SQL>
+		<SQL> DROP TABLE D@TIMES; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE>
+		<SQL>CREATE TABLE T@TIMES (C INT);</SQL>
+		<SQL>CREATE TABLE D@TIMES(C INT);</SQL>
+	</LOOP> 
+	
+	<LOOP> <!-- 这个节点执行完成以后，表T1将有2行数据 -->
+		<TIMES>2</TIMES>
+		<NOSHOW></NOSHOW><!-- 隐藏执行的语句 -->
+		<SQL>INSERT INTO T1 values(12);</SQL>
+	</LOOP> 
+	</SQL_CASE>
+	<LOOP> <!-- 这个节点执行完成以后，表T1将再插2行数据，而不是13行 -->
+		<STARTTIMES>12</STARTTIMES>
+		<TIMES>13</TIMES>
+		<SQL>INSERT INTO T1 values(@TIMES);</SQL>
+	</LOOP> 
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+	<!-- +++++++++++++++++++++ 测试点1：开始 +++++++++++++++++++++ -->
+	<SQL_CASE><!-- STARTTIMES使用-->
+		<SQLSTR2>100</SQLSTR2>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE>
+		<SQL> DROP TABLE T1 CASCADE; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE>
+		<SQLSTR></SQLSTR>
+		<SQLSTR>CREATE TABLE T1(C1 INT</SQLSTR>
+		<LOOP>
+			<TIMES>@SQLSTR2</TIMES>
+			<STARTTIMES>2</STARTTIMES>
+			<SQLSTR>,C@TIMES INT</SQLSTR>
+		</LOOP>
+		<SQLSTR>)</SQLSTR>
+		<SQL> @SQLSTR </SQL><!-- 建表 -->
+		<LOOP>
+			<TIMES>@SQLSTR2</TIMES>
+			<STARTTIMES>1</STARTTIMES><!-- 如果使用两个LOOP，如果子层中使用到STARTTIMES关键字，那么父层一定要指定STARTTIMES关键字 -->
+			<SQLSTR></SQLSTR>
+			<SQLSTR>INSERT INTO T1 VALUES(@TIMES1</SQLSTR><!-- 这是第一列的数据一定要自己事先填好，@TIMES1代表的是，第一行第一列 -->
+			<LOOP>
+				<TIMES>@SQLSTR2</TIMES>
+				<STARTTIMES>2</STARTTIMES>
+				<SQLSTR>,@_TIMES@TIMES</SQLSTR>
+			</LOOP>
+			<SQLSTR>)</SQLSTR>
+			<SQL> @SQLSTR </SQL><!-- 插入行-->
+		</LOOP>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE><!-- 预期执行成功，并返回一个结果集，只验证给定值的长度 -->		
+		<SQL> SELECT * FROM T1 </SQL><!-- 用来验证其列名，示范COLUMNNUMS的使用 -->
+		<RESULT>
+			<RECORDNUMS>@SQLSTR2</RECORDNUMS>
+			<RECORD>
+				<COLUMNNUMS>@SQLSTR2</COLUMNNUMS><!-- 在这里，指定了列数 -->
+				<COLUMN>@RECORDNUMS@COLUMNNUMS</COLUMN><!-- 每一例的值为列号，列号是从一开始计数的 -->
+			</RECORD>
+		</RESULT>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+	
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

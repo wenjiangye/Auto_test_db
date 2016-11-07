@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+																	
+-->
+<!--
+	测试点列表
+	1.		
+-->
+<SQLTEST>
+	<CONTENT> 下面方法可以测试一个连接的正确或是错误 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<MORETHREAD>
+	<!-- +++++++++++++++++++++ 测试点1：开始 +++++++++++++++++++++ -->
+	<SQL_CASE>
+		<CASEEXPRESULT> false </CASEEXPRESULT><!-- 预期是连不上的 -->
+		<UID> ddd </UID>
+		<PWD> ddd </PWD>
+		<DATABASE> ddd </DATABASE>
+		<CONNECT>  </CONNECT>		
+	</SQL_CASE>
+	<SQL_CASE><!-- 预期是连接是正确的 -->
+		<UID> SYSDBA </UID>
+		<PWD> SYSDBA </PWD>
+		<DATABASE> SYSTEM </DATABASE>
+		<CONNECT>  </CONNECT>		
+	</SQL_CASE>
+	
+	<!-- 下面是另外一种方法 -->
+	<SQL_CASE>
+		<NEWCONNECTEXECUTE>
+			<TYPE> LOGIN_SUCCESS </TYPE><!-- 预期执行成功 -->
+			<UID> SYSDBA </UID>
+			<PWD> SYSDBA </PWD>
+			<DATABASE> SYSTEM </DATABASE>
+			<CONNECT>  </CONNECT>
+		</NEWCONNECTEXECUTE>
+		<NEWCONNECTEXECUTE>		
+			<TYPE> LOGIN_FAIL </TYPE><!-- 预期执行成功 -->
+			<UID> SYSDBA </UID>
+			<PWD> ASD </PWD>
+			<DATABASE> SYSTEM </DATABASE>
+			<CONNECT>  </CONNECT>
+		</NEWCONNECTEXECUTE>
+	</SQL_CASE>
+	<!-- 下面是也可以 -->
+	<SQL_CASE>
+		<TYPE> LOGIN_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<UID> SYSDBA </UID>
+		<PWD> SYSDBA </PWD>
+		<DATABASE> SYSTEM </DATABASE>
+		<CONNECT>  </CONNECT>
+	</SQL_CASE>
+	<SQL_CASE>		
+		<TYPE> LOGIN_FAIL </TYPE><!-- 预期执行成功 -->
+		<UID> SYSDBA </UID>
+		<PWD> ASD </PWD>
+		<DATABASE> SYSTEM </DATABASE>
+		<CONNECT>  </CONNECT>
+	</SQL_CASE>
+	</MORETHREAD>
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

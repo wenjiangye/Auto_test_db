@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+																	
+-->
+<!--
+	测试点列表
+	1.		
+-->
+<SQLTEST>
+	<CONTENT>  </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<!-- +++++++++++++++++++++ 测试点1：开始 +++++++++++++++++++++ -->
+	<SQLSTR>100</SQLSTR><!-- 表中的行数 -->
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE>
+		<SQL> DROP TABLE T1 CASCADE; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE>
+		<SQL> CREATE TABLE T1(C1 INT PRIMARY KEY, C2 VARCHAR(100)) </SQL>
+		<LOOP>
+			<TIMES>@SQLSTR</TIMES>
+			<SQL> INSERT INTO T1(C1, C2) VALUES(@TIMES, '@TIMES@TIMES') </SQL>
+		</LOOP>
+		<SQL> SELECT C1, C2 FROM T1; </SQL>
+		<OPEN>
+			<SQL_CASE>
+			<LOOP><!-- 在LOOP没有指定TIMES的情况下，一定要手工跳出来，不然就是个死循环 -->
+				<FETCHNEXT></FETCHNEXT>				
+				<IF>BOOL:@FETCHNEXT = 0</IF><!-- 如果结果集已经到了尾，则退出这个SQL_CASE -->
+				<BREAK>  </BREAK><!--  -->
+				<ELSE>
+					<IF>BOOL:@C1&lt;&gt;@TIMES OR '@C2'&lt;&gt;'@TIMES@TIMES'</IF>
+					<FMES>结果集在第@FETCHNEXT行处返回的值跟预期的不一致，预期:C1=@TIMES, C2=@TIMES@TIMES;实际返回:C1=@C1, C2=@C2</FMES>
+					<BREAK> 跳出这个LOOP </BREAK>
+				</ELSE>
+				<ROWS></ROWS><!-- 如果要在最后比较行数的话，那就先把这个游标所在的行保存到一个临时变量里 -->
+				<ROWS>@FETCHNEXT</ROWS>
+			</LOOP>
+			</SQL_CASE>
+		</OPEN>
+		<IF>BOOL:@ROWS&lt;&gt;@SQLSTR</IF>
+		<FMES>结果集的行数不一致，预期是@SQLSTR行，实际返回@ROWS行</FMES>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<SQLTEST>
+	<SQL_CASE>
+		<!-- 用例描述 -->
+		<CONTENT> 该测试用例用来描述如何编写测试非法操作的测试用例 </CONTENT>
+	</SQL_CASE>
+	<SQL_CASE><!-- 一个语句段落，该关键字用来组织用例，让它容易阅读 -->
+		<SQL> CREATE TABLE TT(C INT) </SQL>		
+	</SQL_CASE>
+	<IGNORE> <!-- 不执行下面这个CASE模块 --> 
+		<SQL_CASE>
+			<SQL> SELECT * FROM TT </SQL>
+			<EFFECTROWS> 0 </EFFECTROWS><!-- 表示返回的是一个空的结果集 -->
+		</SQL_CASE>
+	</IGNORE>	
+	<SQL_CASE>
+		<SQL> INSERT INTO TT VALUES(1) </SQL>
+		<SQL> INSERT INTO TT VALUES(1) </SQL>
+		<EFFECTROWS> 1 </EFFECTROWS><!-- 影响了一行记录 -->
+		<BREAK>  </BREAK><!-- 跳出这个CASE，不执行下面的代码 -->
+		<SQL> INSERT INTO TT SELECT * FROM TT </SQL>
+		<EFFECTROWS> 1 </EFFECTROWS><!-- 影响了二行记录 -->
+	</SQL_CASE>
+	<CLEAR>
+		<SQL_CASE>
+			<SQL> DROP TABLE TT </SQL>			
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST>

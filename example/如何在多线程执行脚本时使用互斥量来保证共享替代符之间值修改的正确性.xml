@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1		编写			创建			孙峰		2009-2-11						
+-->
+<!--
+	测试点列表
+	1.		
+-->
+<SQLTEST>
+	<CONTENT> 如何在多线程执行脚本时使用互斥量来保证共享替代符之间值修改的正确性 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<TOGETHER><!-- 该例子展示了如何两个线程同时修改一个共享替代符 -->
+		<SETVAL>
+			<VALNAME>SQLSTR</VALNAME><!-- 注意，这里的@SQLSTR和<SQLSTR>关键字指定的@SQLSTR是不一样的，前者是全局变量，整个TOGETHER中所有的线程都可以看到，后者是局部变量，只有在自己的线程里才能看得到 -->
+			<VAL></VAL><!-- 在这里先设置一个初始值 -->
+		</SETVAL>
+		<UNIT>
+			<LOOP>
+				<TIMES>1000</TIMES>
+				<ENTER>SQLSTR</ENTER><!-- 进入共享SQLSTR的临界区 -->
+				<GETVAL><!-- 把全局的@SQLSTR读取后保存到局部的@SQLSTR中 -->
+					<VALNAME>SQLSTR</VALNAME>
+					<VAL>@SQLSTR</VAL>
+				</GETVAL>
+				<SQLSTR>1</SQLSTR><!-- 修改@SQLSTR替代符的值，在其后面追加一个字符1 -->
+				<SETVAL><!-- 把局部的替代符@SQLSTR保存到全局的@SQLSTR中 -->
+					<VALNAME>SQLSTR</VALNAME>
+					<VAL>@SQLSTR</VAL>
+				</SETVAL>				
+				<EXIT>SQLSTR</EXIT><!-- 退出共享SQLSTR的临界区 -->				
+				<SLEEP>1</SLEEP>
+			</LOOP>
+			<SMES>线程1追加完成</SMES>
+
+		</UNIT>
+		<UNIT>
+			<LOOP>
+				<TIMES>1000</TIMES>
+				<ENTER>SQLSTR</ENTER><!-- 进入共享SQLSTR的临界区 -->
+				<GETVAL><!-- 把全局的@SQLSTR读取后保存到局部的@SQLSTR中 -->
+					<VALNAME>SQLSTR</VALNAME>
+					<VAL>@SQLSTR</VAL>
+				</GETVAL>
+				<SQLSTR>A</SQLSTR><!-- 修改@SQLSTR替代符的值，在其后面追加一个字符A -->
+				<SETVAL><!-- 把局部的替代符@SQLSTR保存到全局的@SQLSTR中 -->
+					<VALNAME>SQLSTR</VALNAME>
+					<VAL>@SQLSTR</VAL>
+				</SETVAL>				
+				<EXIT>SQLSTR</EXIT><!-- 退出共享SQLSTR的临界区 -->	
+				<SLEEP>1</SLEEP>			
+			</LOOP>		
+			<SMES>线程2追加完成</SMES>
+		</UNIT>
+		<SLEEP>5000</SLEEP><!-- 睡5秒，等待上面两个线程执行完再检查执行结果 -->
+		<SQL_CASE>
+			<GETVAL><!-- 检查操作以后的结果 -->
+				<VALNAME>SQLSTR</VALNAME>
+				<VAL>@SQLSTR</VAL>
+			</GETVAL>
+			<SMES>@SQLSTR</SMES>
+			<STRLEN><EXP>len('@SQLSTR')</EXP></STRLEN>
+			<IF>@STRLEN&lt;&gt;2000</IF>
+			<FMES>字符串追加的长度出错了，正确的值应该是2000，实际的值是:@STRLEN</FMES>
+		</SQL_CASE>
+	</TOGETHER>
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

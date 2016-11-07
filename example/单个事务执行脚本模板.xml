@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<SQLTEST>
+	<CONTENT> -PRO_00001-该测试用例用来测试带or replace选项的存储过程定义语句 </CONTENT>
+	
+	<SQL_CASE>
+		<SQL>CREATE TABLE T01_PRO_00001 (C1 INT,C2 CHAR(10));</SQL>
+	</SQL_CASE>	
+	<SQL_CASE>
+		<BEGINTRANS></BEGINTRANS>
+		<TYPE>DIRECT_EXECUTE_SUCCESS</TYPE>
+		<SQL>INSERT INTO T01_PRO_00001 VALUES (1,'A');</SQL>
+		<SQL>INSERT INTO T01_PRO_00001 VALUES (2,'B');</SQL>
+		<ENDTRANS>COMMIT</ENDTRANS>
+	</SQL_CASE>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE><!-- 预期执行成功，并返回一个结果集，只验证给定值的长度 -->
+		<SQL> SELECT * FROM T01_PRO_00001 </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>1</COLUMN><COLUMN>A</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>2</COLUMN><COLUMN>B</COLUMN>
+			</RECORD>
+		</RESULT>
+	</SQL_CASE>
+	
+	
+	<!--  测试用例清除快，该关键字标识清除块开始。如果上面某条语句执行出错后，程序会自动跳到这块来做环境清除工作 --> 
+	<CLEAR>
+		<SQL_CASE>
+			<SQL>DROP TABLE T01_PRO_00001</SQL>
+		</SQL_CASE>
+	</CLEAR>
+
+</SQLTEST>
+
+
+

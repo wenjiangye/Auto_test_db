@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1		编写			创建			孙峰		2009-2-12						
+-->
+<!--
+	测试点列表
+	1.		
+-->
+<SQLTEST>
+	<CONTENT> 如何传递替代符到Disposetrans处理的子脚本 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<SQLSTR>10</SQLSTR>
+	<SETVAL><!-- 把替代符保存到共享替代符中 -->
+		<VALNAME>SQLSTR</VALNAME>
+		<VAL>@SQLSTR</VAL>
+	</SETVAL>
+	<MORETHREAD><!-- 子进程启动以后，会自动加载主脚本保存的共享替代符 -->
+		<THREADS>@SQLSTR</THREADS>
+		<CONNECT></CONNECT>
+		<DISCONNECT></DISCONNECT>
+	</MORETHREAD>	
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

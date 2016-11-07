@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1		编写			创建			孙峰		2007-11-26						
+-->
+<!--
+	测试点列表
+	1.		
+-->
+<SQLTEST>
+	<CONTENT> 测试阻塞 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<NEWTRANS>  </NEWTRANS>
+	<!-- +++++++++++++++++++++ 测试点1：开始 +++++++++++++++++++++ -->
+	<SQL_CASE>		
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE>
+		<SQL> DROP TABLE T1 CASCADE; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE>
+		<SQL> CREATE TABLE T1(C INT PRIMARY KEY, C1 INT) </SQL>
+	</SQL_CASE>
+	<SQL_CASE>
+		<BEGINTRANS> Serializable </BEGINTRANS>
+		<SQL> INSERT INTO T1 VALUES(1, 1); </SQL>	<!-- 把这句话去掉，测试脚本就会报错，因为TRANS的插入就不会被阻 -->	
+	</SQL_CASE>
+	<TRANS0>
+		<SQL> INSERT INTO T1 VALUES(1, 1); </SQL><!-- 在这里，肯定会被阻塞，因为上一次插入没有提交 -->
+		<IF>@USEDTIMES&gt;500</IF><!-- 如果执行的时间大于500毫秒，那么就报错（注意，TRANS中的语句默认执行时间为1秒，如果上一个要判断的执行语句执行要花大于一秒的时间，那么请在主脚本中睡眠指定的时间） -->
+		<SMES> 测试成功，插入语句成功的被阻塞 </SMES>
+		<ELSE>
+			<FMES> 测试失败，插入语句未成阻塞 </FMES>
+		</ELSE>
+	</TRANS0>
+	<SLEEP>1000</SLEEP><!-- 主脚本睡一秒再提交，保证TRANS有足够的时间执行插入语句 -->
+	<SQL_CASE>
+		<ENDTRANS> ROLLBACK </ENDTRANS><!-- 这个提交会导到TRANS阻塞取消 -->
+	</SQL_CASE>
+	<SLEEP>500</SLEEP><!-- 主脚本睡眠，让TRANS有时间提交语句 -->
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+</SQLTEST> 

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1		编写			创建			孙峰		2008-4-11						
+-->
+<!--
+	测试点列表
+	1.		
+-->
+<SQLTEST>
+	<CONTENT> 结果集比较--这个方办适合结果集行数为多行情况，这个方法有点麻烦，不如异构数据库结果集比较的办法来得简单 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT>0</CONNECT><!-- 首先要建立两个连接，用来打开两个结果集 -->
+	<CONNECT>1</CONNECT>
+	<!-- +++++++++++++++++++++ 测试点1：开始 +++++++++++++++++++++ -->
+	<SQL_CASE><!-- 这个例子用两张表中的数据来对比，预期是一致的 -->
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE>
+		<SQL> DROP TABLE T1 CASCADE; </SQL>
+		<SQL> DROP TABLE T2 CASCADE; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE>
+		<SQL> CREATE TABLE T1(C INT PRIMARY KEY, C1 INT) </SQL>
+		<SQL> CREATE TABLE T2(C INT PRIMARY KEY, C1 INT) </SQL>
+		<SQL> INSERT INTO T1(C, C1) VALUES(1, 1) </SQL>
+		<SQL> INSERT INTO T2(C, C1) VALUES(1, 1) </SQL>		
+	</SQL_CASE>
+	<SQL_CASE>
+		<SETCONNECTID> 0 </SETCONNECTID><!-- 先用第一个连接，把表T1打开 -->
+		<SQL> SELECT C AS A1, C1 AS A2 FROM T1; </SQL><!-- 注意，这里因为两个表的列名是一样的，所以你要自定义别名，免得在打开结集后，行数据存放会造成替代符冲突 -->
+		<OPEN>			
+			<SETCONNECTID> 1 </SETCONNECTID><!-- 先用第二个连接，把表T2打开 -->
+			<SQL> SELECT C AS B1, C1 AS B2 FROM T2; </SQL>
+			<OPEN>
+				<LOOP>
+					<SETCONNECTID> 0 </SETCONNECTID><!-- 设置第一个连接，把结果集游标向下移一行，并保存游标的状态 -->
+					<FETCHNEXT></FETCHNEXT>
+					<SQLSTR></SQLSTR><!-- 先清空，才能再次保存 -->
+					<SQLSTR>@FETCHNEXT</SQLSTR><!-- 保存这个游标的状态 -->
+					<SETCONNECTID> 1 </SETCONNECTID><!-- 设置第二个连接，把结果集游标向下移一行 -->
+					<FETCHNEXT></FETCHNEXT>
+					<IF>BOOL:@SQLSTR=@FETCHNEXT AND @A1=@B1 AND @A2=@B2</IF><!-- 判断游标是所在行数是否一致，如果结果集已经到尾，@FETCHNEXT会被置为0 -->
+					<ELSE>
+						<FMES>两个结果集不一致!SQLSTR:@SQLSTR; FETCHNEXT:@FETCHNEXT; A1:@A1; A2:@A2; B1:@B1;B2:@B2</FMES>
+						<BREAK>  </BREAK><!-- 跳出结果集对比 -->
+					</ELSE>
+					<IF>BOOL:@FETCHNEXT=0</IF>
+					<BREAK> 结果集结束，跳出LOOP </BREAK>
+				</LOOP>				
+			</OPEN>		
+		</OPEN>
+		
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

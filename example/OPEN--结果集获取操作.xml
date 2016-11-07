@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1								孙峰								
+-->
+<!--
+	测试点列表
+	1.		
+-->
+<SQLTEST>
+	<CONTENT> 结果集获取操作 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<!-- +++++++++++++++++++++ 测试点1：开始 +++++++++++++++++++++ -->
+	<SQL_CASE><!-- 不使用LOOP获取 -->
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->		
+		<SQL> DROP TABLE T1; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->		
+		<SQL> CREATE TABLE T1(C INT, C1 INT); </SQL>
+		<SQL> INSERT INTO T1 VALUES(1, 11); </SQL>
+		<SQL> INSERT INTO T1 VALUES(2, 22); </SQL>
+		<SQL> SELECT C, C1 FROM T1; </SQL>
+		<OPEN><!-- 打开结果集 -->
+			<FETCHNEXT></FETCHNEXT><!-- 把结果集游标设置到下一行 -->
+			<IF>BOOL:@C=1 AND @C1=11</IF><!-- 判断值是否正确，在这里，每行的值都已经设置到替代符中，每列的替代符是@+列名 -->
+			<ELSE>
+				<FMES>返回的结果集第一行不正确，预期: C=@C, C1=@C1</FMES>
+			</ELSE>
+			<FETCHNEXT></FETCHNEXT><!-- 把结果集游标设置到下一行 -->
+			<IF>BOOL:@C=2 AND @C1=22</IF>
+			<ELSE>
+				<FMES>返回的结果集第一行不正确，预期: C=@C, C1=@C1</FMES>
+			</ELSE>
+		</OPEN>
+	</SQL_CASE>
+	<ROWNUM>100</ROWNUM><!-- 申请一个变量，指定好行的数量 -->
+	<SQL_CASE><!-- 使用LOOP获取 -->
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->		
+		<SQL> DROP TABLE T1; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->		
+		<SQL> CREATE TABLE T1(C INT, C1 INT); </SQL>
+		<LOOP>
+			<TIMES>@ROWNUM</TIMES>
+			<NOSHOW></NOSHOW>
+			<SQL> INSERT INTO T1 VALUES(@TIMES, @TIMES@TIMES); </SQL>
+		</LOOP>		
+		<SQL> SELECT C, C1 FROM T1; </SQL>
+		<OPEN><!-- 打开结果集 -->
+			<LOOP>
+				<TIMES>@ROWNUM</TIMES>
+				<FETCHNEXT></FETCHNEXT><!-- 把结果集游标设置到下一行 -->
+				<IF>BOOL:@FETCHNEXT=0</IF><!--@FETCHNEXT表示上一次设置游标到下一行是否成功， 如果成功，@FETCHNEXT的值为游标所在的行数，不成功则为0 -->
+				<FMES>结果集中的行数不对，预期行数为:@ROWNUM, 实际行数为:@TIMES</FMES>
+				<BREAK>  </BREAK>
+				<ELSE>
+					<IF>BOOL:@C&lt;&gt;@FETCHNEXT OR @C1&lt;&gt;@FETCHNEXT@FETCHNEXT</IF><!-- 判断值是否正确，@FETCHNEXT表示游标所在的行数 -->
+					<FMES>结果集中第@FETCHNEXT行的值不对，预期行数为C:@FETCHNEXT, C1:@FETCHNEXT@FETCHNEXT</FMES>
+					<BREAK>  </BREAK>
+				</ELSE>
+			</LOOP>
+		</OPEN>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

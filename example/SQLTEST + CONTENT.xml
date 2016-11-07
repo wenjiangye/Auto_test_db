@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<SQLTEST>
+	<CONTENT> 该测试用例用来测试...... </CONTENT><!-- 用例描述 -->
+	
+	<CONTENT> 该关键字可以放在脚本的任何一个需要显示描述的地方 </CONTENT><!-- 脚本执行部分描述 -->
+</SQLTEST>

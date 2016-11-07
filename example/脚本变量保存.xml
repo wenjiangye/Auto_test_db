@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1								孙峰		2007-10-9						
+-->
+<!--
+	测试点列表
+	1.		
+-->
+<SQLTEST>
+	<CONTENT> SETVAL和GETVAL的样例，这两个关键字在主程序执行和在用DisposeTrans.exe来执行，含意是一样的，但是内部实现是完全不一样，切记。主脚本保存的值不能在DisposeTrans.exe中获取 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<!-- +++++++++++++++++++++ 测试点1：开始 +++++++++++++++++++++ -->
+	<SQL_CASE>
+		<SQLSTR>这是一个原始的串</SQLSTR>
+		<SETVAL>
+			<VALNAME>字串1</VALNAME>
+			<VAL>@SQLSTR</VAL><!-- 在这里存放当前@SQLSTR变量的串 -->
+		</SETVAL>		
+		<SQLSTR></SQLSTR>
+		<SQLSTR>这是一个修改后的串</SQLSTR>
+		<GETVAL>
+			<VALNAME>字串1</VALNAME>
+			<VAL>@SQLSTR</VAL><!-- 在这里‘这是一个原始的串’会被还原到@SQLSTR串中--><!-- 在VAL中，有三个可选存放变量，分别是@SQLSTR, @SQLSTR1, @SQLSTR2 -->
+		</GETVAL>
+		<SQL> SELECT &apos;@SQLSTR&apos;; </SQL>		
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			<SETVAL>
+				<VALNAME>字串1</VALNAME>
+				<VAL>DEL</VAL><!-- 用这种方式来删除刚才保存的变量 -->
+			</SETVAL>
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

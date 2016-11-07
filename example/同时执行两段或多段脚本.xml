@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1		是个样例		创建			孙峰		2007-5-22							
+-->
+<SQLTEST>
+	<CONTENT> 该脚本只是示范如何在XML中同时执行两段或多段脚本 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<!-- +++++++++++++++++++++ 测试点1：开始 +++++++++++++++++++++ -->
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> DROP TABLE T1; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> CREATE TABLE T1(C INT IDENTITY, C1 INT) </SQL>		
+	</SQL_CASE>	
+	<SQL_CASE><!-- 下面脚本段演示三个连接，同时向表t1做插入操作 -->
+		<TOGETHER>
+			<UNIT><!-- 第一个连接做的脚本 -->
+				<UID> SYSDBA </UID><!-- 登录信息，如果不指定，那么，使用当前连接的信息 -->
+				<PWD> SYSDBA </PWD> 
+				<DATABASE> SYSTEM </DATABASE>
+				<SQL_CASE>
+					<LOOP><!-- 执行一千次的插入操作 -->
+						<TIMES> 1000 </TIMES>
+						<SQL> INSERT INTO T1(C1) VALUES(1) </SQL>
+					</LOOP>										
+				</SQL_CASE>	
+			</UNIT>
+			<UNIT><!-- 第二个连接做的脚本 -->
+				<UID> @UID </UID><!-- 登录信息当然也可以用替代关键字的方式来指定工具中设置的连接信息 -->
+				<PWD> @PWD </PWD> 
+				<DATABASE> @DATABASE </DATABASE>
+				<SQL_CASE>
+					<LOOP><!-- 执行一千次的插入操作 -->
+						<TIMES> 1000 </TIMES>
+						<SQL> INSERT INTO T1(C1) VALUES(2) </SQL>
+					</LOOP>										
+				</SQL_CASE>	
+			</UNIT>
+			<UNIT><!-- 第三个连接做的脚本 -->
+				<SQL_CASE><!-- 没有指定连接信息的时候，那么会直接使用当前连接信息来连接 -->
+					<LOOP><!-- 执行一千次的插入操作 -->
+						<TIMES> 1000 </TIMES>
+						<SQL> INSERT INTO T1(C1) VALUES(3) </SQL>
+					</LOOP>										
+				</SQL_CASE>	
+			</UNIT>
+		</TOGETHER>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

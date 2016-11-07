@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1		编写			创建			孙峰		2009-2-11						
+-->
+<!--
+	测试点列表
+	1.		
+-->
+<SQLTEST>
+	<CONTENT> 这个脚本示范了多个线程并发随机的选取某个SQL语句来执行，该功能必需搭配2009-02-10以后的DisposeTrans.exe程序才能使用 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<MORETHREAD>
+		<THREADS>10</THREADS><!-- 线程数 -->
+		<TIMES>10</TIMES><!-- 每个线程这段脚本运行的次数 -->
+		<RAND><EXP>rnd()*100 mod 10</EXP></RAND><!-- 随机生成一个0到9之间的一个值，用来定位要执行的语句 -->
+		<IF>@RAND=0</IF><!-- 如果随机值为0，那么执行SELECT 0 -->
+			<!-- 在这里执行随机值为0时的脚本，一直到下一个ELSE节点 -->
+			<SMES>SELECT @RAND</SMES>
+		<ELSE><!-- 否则继续往下判断 -->
+			<IF>@RAND=1</IF><!-- 如果随机值为1，那么执行slect 1 -->
+				<!-- 在这里执行随机值为1时的脚本，一直到下一个ELSE节点 -->
+				<SMES>SELECT @RAND</SMES>
+			<ELSE>
+				<IF>@RAND=2</IF>
+					<SMES>SELECT @RAND</SMES>
+				<ELSE>
+					<SMES>SELECT @RAND</SMES>
+				</ELSE>
+			</ELSE>
+		</ELSE>
+	</MORETHREAD>
+</SQLTEST> 

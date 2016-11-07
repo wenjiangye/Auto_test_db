@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<SQLTEST>
+	<SQL_CASE>
+		<!-- 用例描述 -->
+		<CONTENT> 该测试用例用来描述如何编写测试非法操作的测试用例 </CONTENT>
+	</SQL_CASE>
+	<SQL_CASE><!-- 一个语句段落，该关键字用来组织用例，让它容易阅读 -->
+		<CASEEXPRESULT> false </CASEEXPRESULT>
+		<TYPE>DIRECT_EXECUTE_SUCCESS</TYPE><!-- 预期执行结果：返回错误-->
+		<SQLSTATE>42000</SQLSTATE><!-- 预期执行报错返回的状态码 -->
+		<NERROR>-1038</NERROR><!-- 预期执行报错返回的服务器错误码 -->
+		<SQL>asdfasdfasdfasdf;</SQL><!-- 调用一个非法的函数名(函数不存在) -->
+	</SQL_CASE>
+</SQLTEST>

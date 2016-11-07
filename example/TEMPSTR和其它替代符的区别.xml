@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1								孙峰		2008-4-2						
+-->
+<!--
+	测试点列表
+	1.		
+-->
+<SQLTEST>
+	<CONTENT> TEMPSTR和其它替代符的区别 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<!-- +++++++++++++++++++++ 测试点1：开始 +++++++++++++++++++++ -->
+	<SQL_CASE>
+		<TEMPSTR>1</TEMPSTR>
+		<TEMPSTR>@TEMPSTR</TEMPSTR>
+		<SMES>@TEMPSTR</SMES><!-- 在这里可以发现，TEMPSTR没有替换自己 -->
+		
+		<SQLSTR>1</SQLSTR>
+		<SQLSTR>@SQLSTR</SQLSTR>
+		<SMES>@SQLSTR</SMES><!-- 在这里可以发现，SQLSTR会换自己 -->			
+	</SQL_CASE>
+	<SQL_CASE><!-- 有了TEMPSTR不会替代自己的特性以后，就可以叠代出有层次的语句 -->	
+		<TEMPSTR></TEMPSTR><!-- 清空 -->
+		<SQLSTR></SQLSTR><!-- 清空 -->
+		<TEMPSTR>开始{ @TEMPSTR }结尾</TEMPSTR>
+		<SQLSTR>@TEMPSTR</SQLSTR><!-- 把TEMPSTR传给SQLSTR后，SQLSTR再内部自己替代，就可以达到层次化 -->
+		<SMES>@SQLSTR</SMES><!-- 看到效果没有？ -->
+		<SQLSTR>@</SQLSTR><!-- 中间只有一个@，表示SQLSTR内部替代一次 -->
+		<SMES>@SQLSTR</SMES><!-- 看到效果没有？ -->
+		<SQLSTR>@</SQLSTR><!-- 再替代一次 -->
+		<SMES>@SQLSTR</SMES><!-- 看到效果没有？ -->
+		<TEMPSTR></TEMPSTR><!-- 在重新指定TEMPSQTR之前，一定要清空哦 -->
+		<TEMPSTR>结束</TEMPSTR><!-- 最后把SQLSTR中的TEMPSTR去掉，只需要重置TEMPSTR的内容就可以了 -->
+		<SQLSTR>@</SQLSTR><!-- 最后一次 -->
+		<SMES>@SQLSTR</SMES><!-- 看到效果没有？ -->
+	</SQL_CASE>
+	
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

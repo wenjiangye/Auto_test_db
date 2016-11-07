@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1		编写			创建			孙峰		2008-3-18						
+-->
+<!--
+	测试点列表
+	1.		
+-->
+<SQLTEST>
+	<CONTENT> 空结果集的两种表达方式 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<!-- +++++++++++++++++++++ 测试点1：开始 +++++++++++++++++++++ -->
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE>
+		<SQL> DROP TABLE T1 CASCADE; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE>
+		<SQL> CREATE TABLE T1(C INT); </SQL>
+		<SQL> SELECT * FROM T1; </SQL>
+		<EFFECTROWS> 0 </EFFECTROWS><!-- 是个空结果集，如果里面的值不为0，那就代表是一个非空结果集 -->	
+		
+		
+		
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE><!-- 预期执行成功，并返回一个结果集，只验证给定值的长度 -->
+		<SQL> SELECT * FROM T1; </SQL>
+		<RESULT><!-- (插入的结果集是一个空结果集) -->
+		</RESULT>
+		
+		
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE><!-- 预期执行成功，并返回一个结果集，只验证给定值的长度 -->
+		<SQL> SELECT * FROM T1; </SQL>
+		<RESULT><!-- (插入的结果集是一个空结果集) -->
+			<RECORDNUMS>0</RECORDNUMS><!-- 指定的值小于等于0，表示是一个空的结果集 -->
+		</RESULT>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

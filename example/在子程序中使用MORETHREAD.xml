@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+																	
+-->
+<!--
+	测试点列表
+	1.		
+-->
+<SQLTEST>
+	<CONTENT>  </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->		
+		<SQL> drop table t1; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t1(c int); </SQL>		
+	</SQL_CASE>
+	<!-- +++++++++++++++++++++ 测试点1：开始 +++++++++++++++++++++ -->
+	<NEWTRANS>  </NEWTRANS><!-- 启动子进程 -->
+	<TRANS0><!-- 发送脚本 -->
+		<MORETHREAD> 
+			<THREADS> 3 </THREADS><!-- 会启动三个线程 -->
+			<TIMES> 100 </TIMES><!-- 每个线程都会把下面的脚本执行10次 -->
+			<SQL> SELECT * FROM T1; </SQL>			
+		</MORETHREAD>
+	</TRANS0>
+	<TRANS0><!-- 发送脚本 -->
+		<TOGETHER> 
+			<UNIT>
+				<TIMES> 100 </TIMES>
+				<SQL> SELECT 1,* FROM T1; </SQL>	
+			</UNIT>
+			<UNIT>
+				<TIMES> 100 </TIMES>
+				<SQL> SELECT 2,* FROM T1; </SQL>	
+			</UNIT>	
+		</TOGETHER>
+	</TRANS0>
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1								孙峰		2007-10-9						
+-->
+<!--
+	测试点列表
+	1.		
+-->
+<SQLTEST>
+	<CONTENT> 单个脚本中连接不同的数据库，对结果集进行对比 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<!-- +++++++++++++++++++++ 测试点1：开始 +++++++++++++++++++++ -->
+	<!-- 连接到达梦数据库 -->
+	<UID> SYSDBA </UID>
+	<PWD> SYSDBA </PWD>
+	<DATABASE> SYSTEM </DATABASE>
+	<PROVIDER>DMOLEDB.1</PROVIDER>
+	<CONNECT> 0 </CONNECT>
+	<!-- 连接到SQL SERVER数据库 -->
+	<UID> sa </UID>
+	<PWD> sa </PWD>
+	<DATABASE> MASTER </DATABASE>
+	<PROVIDER>SQLOLEDB.1</PROVIDER>
+	<SERVER>127.0.0.1</SERVER>
+	<CONNECT> 1 </CONNECT>	
+	<SQL_CASE>
+		<SETCONNECTID> 1 </SETCONNECTID>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> DROP TABLE T1; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> CREATE TABLE T1(C INT, C1 VARCHAR(100)); </SQL>
+		<SQL> INSERT INTO T1 VALUES(1, 'AA'); </SQL>		
+	</SQL_CASE>	
+	<SQL_CASE>
+		<SETCONNECTID> 0 </SETCONNECTID>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> DROP TABLE T1; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> CREATE TABLE T1(C INT, C1 VARCHAR(200)); </SQL>
+		<SQL> INSERT INTO T1 VALUES(1, 'AA'); </SQL>
+	</SQL_CASE>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行的结果只能为SUCCESS，FAIL和IGNORE -->		
+		<SETCONNECTID> 0 </SETCONNECTID><!-- 设置连接0执行一条查询语句 -->
+		<SQL> SELECT * FROM T1; </SQL>
+		<SETCONNECTID> 1 </SETCONNECTID><!-- 设置连接1执行一条查询语句 -->
+		<SQL> SELECT * FROM T1; </SQL>
+		<COMPARERESULT><!-- 对比 -->
+			<CONNECTID>0</CONNECTID><!-- 左边结果集的连接ID号 -->
+			<CONNECTID>1</CONNECTID><!-- 右边结果集的连接ID号 -->
+		</COMPARERESULT>	
+	</SQL_CASE>
+
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

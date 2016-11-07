@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<SQLTEST>
+	<CONTENT> 该测试用例用来描述如何使用关键字EXEXML和EXEPROCESS进行操作 </CONTENT>
+	<SQL_CASE>
+		<!-- 调用xml文件 -->
+		<EXEXML>XXX.xml </EXEXML>
+	</SQL_CASE>
+	<SQL_CASE>
+		<!-- 调用可执行文件 -->
+		<EXEPROCESS>XXX.exe </EXEPROCESS>
+	</SQL_CASE>
+</SQLTEST>

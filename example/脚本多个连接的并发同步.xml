@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1		编写			创建			孙峰		2008-4-16						
+-->
+<!--
+	测试点列表
+	1.		
+-->
+<SQLTEST>
+	<CONTENT> 脚本多个连接的并发同步 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<!-- +++++++++++++++++++++ 测试点1：开始 +++++++++++++++++++++ -->
+	<TOGETHER>
+		<SETVAL>
+			<VALNAME>SQLSTR</VALNAME><!-- 注意，这里的@SQLSTR和<SQLSTR>关键字指定的@SQLSTR是不一样的，前者是全局变量，整个TOGETHER中所有的线程都可以看到，后者是局部变量，只有在自己的线程里才能看得到 -->
+			<VAL>0</VAL><!-- 在这里先设置一个初始值 -->
+		</SETVAL>
+		<UNIT><!-- 只有当同步值为1时，这个线程才会退出，也就是说，只有当第二个线程运行以后，这个线程才会退出 -->
+			<LOOP>
+				<GETVAL><!-- 把全局的@SQLSTR读取后保存到局部的@SQLSTR中 -->
+					<VALNAME>SQLSTR</VALNAME>
+					<VAL>@SQLSTR</VAL>
+				</GETVAL>
+				<IF>@SQLSTR=1</IF><!-- 如果发现同步值被置为1以后，那么这个线程才会跳出LOOP -->
+				<SMES>检测到线程二已经启动，线程一退出</SMES>
+				<BREAK>  </BREAK>
+				<ELSE>
+					<SMES>@SQLSTR</SMES>
+					<SLEEP>100</SLEEP>
+				</ELSE>
+			</LOOP>
+		</UNIT>
+		<UNIT>
+			<SMES>线程二已经启动，线程一可以退出来</SMES>
+			<SETVAL>
+				<VALNAME>SQLSTR</VALNAME>
+				<VAL>1</VAL><!-- 在这里设置@SQLSTR的值为1，让线程一退出 -->
+			</SETVAL>			
+		</UNIT>
+	</TOGETHER>
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

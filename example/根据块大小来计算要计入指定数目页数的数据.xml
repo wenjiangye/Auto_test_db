@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1		编写			创建			孙峰		2008-4-15						
+-->
+<!--
+	测试点列表
+	1.		
+-->
+<SQLTEST>
+	<CONTENT> 根据块大小来计算要计入指定数目页数的数据 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<!-- +++++++++++++++++++++ 测试点1：开始 +++++++++++++++++++++ -->
+	<TOTALPAGE>10000</TOTALPAGE><!-- 总共打算要插入的页数 -->
+	<LOOP><!-- 构造一个长度为1000的字符串 -->
+		<TIMES>100</TIMES>
+		<ROWDATA>0123456789</ROWDATA>
+	</LOOP>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE>
+		<SQL> DROP TABLE T1 CASCADE; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE>
+		<SQL> CREATE TABLE T1(C INT PRIMARY KEY, C1 VARCHAR(1000)) </SQL><!-- 先建一个大约行大小占用1000个字节的表 -->
+	</SQL_CASE>
+	<SQL_CASE>
+		<SQLSTR>FromSql:select page();</SQLSTR>
+		<ROWNUMBER>FromSql:SELECT CAST((@SQLSTR/1000)*@TOTALPAGE AS INT)</ROWNUMBER><!-- 求得大约要插入的行数, (@SQLSTR/1000)为一页需要的行数 -->
+		<SMES>大约要插入@ROWNUMBER行</SMES>
+		<LOOP>
+			<TIMES>@ROWNUMBER</TIMES>
+			<NOSHOW></NOSHOW>
+			<SQL>INSERT INTO T1 VALUES(@TIMES, '@ROWDATA')</SQL>
+		</LOOP>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

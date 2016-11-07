@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<SQLTEST>
+	<!-- 用例描述 -->
+	<CONTENT> 该测试用例用来描述如何使用CONNECT关键字进得单个连接操作的 </CONTENT>
+	<SQL_CASE>
+		<!-- 服务器名 -->
+		<SERVER>LOCALHOST</SERVER><!-- 注意：该关键字一般不指定，是在工具里面设的！！！！ -->
+		<!-- 登录名 -->
+		<UID>SYSDBA</UID><!-- 可以不指定，用工具默认的 -->
+		<!-- 登录口令 -->
+		<PWD>SYSDBA</PWD><!-- 可以不指定，用工具默认的 -->
+		<!-- 初始化库名 -->
+		<DATABASE>SYSTEM</DATABASE><!-- 可以不指定，用工具默认的 -->
+		<!-- 连接 -->
+		<CONNECT></CONNECT><!-- 默认进行连接，可以不用写CONNECT关键字，直接跳到下面写语句就可以了 -->	
+	</SQL_CASE>	
+	<SQL_CASE>
+		<!-- 要执行的SQL语句 -->
+		<SQL>CREATE TABLE T(C INT)</SQL>
+		<SQL>DROP TABLE T</SQL><!-- 后面可以跟无数条语句，但是预期结果都是执行成功 -->
+	</SQL_CASE>
+	<SQL_CASE>
+		<DISCONNECT> </DISCONNECT><!-- 断开连接 -->
+	</SQL_CASE>
+</SQLTEST>

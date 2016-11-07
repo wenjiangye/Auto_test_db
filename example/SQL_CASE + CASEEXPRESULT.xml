@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<SQLTEST>
+	<CONTENT> 该测试用例用来描述如何使用SQL_CASE和CASEEXPRESULT关键字 </CONTENT><!-- 用例描述 -->
+	<SQL_CASE>
+		<CASEEXPRESULT> false </CASEEXPRESULT><!-- 预期这个SQL_CASE执行失败 -->
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> CREATE TABLE TT </SQL><!-- 语法错 -->		
+	</SQL_CASE>
+	<SQL_CASE>
+		<CASEEXPRESULT> false </CASEEXPRESULT><!-- 预期这个SQL_CASE执行失败(连接数据库失败，因为使用了一个不存在的登录) -->
+		<!-- 用一个不存在的登录去连接数据库，应该失败 -->
+		<UID> NOLOGIN </UID>
+		<PWD> NOLOGIN </PWD>
+		<DATABASE> NOLOGIN </DATABASE>
+		<CONNECT> 1 </CONNECT>		
+	</SQL_CASE>
+	<SQL_CASE><!-- 该SQL_CASE没有CASEEXPRESLT关键字描述，那么它的默认执行结果为TRUE -->
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->		
+		<SQL> CREATE TABLE TT</SQL>
+	</SQL_CASE>
+	
+</SQLTEST>

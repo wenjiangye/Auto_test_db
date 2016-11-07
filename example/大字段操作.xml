@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1								孙峰		2009-7-21						
+-->
+<!--
+	测试点列表
+	1.		
+-->
+<SQLTEST>
+	<CONTENT> 把一个大字段插入到数据库中 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<TestPointBegin> 测试点1：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> drop table t1 cascade; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t1(c int primary key, c1 blob, c2 clob); </SQL>
+		<READFILE><!-- 把一个文件按二进制的方式读取到替代符中 -->
+			<FILENAME>@PATH\测试文件.txt</FILENAME><!-- 指定这个文件所在的位置是跟本脚本在同一个目录下 -->
+			<VALNAME>@P1</VALNAME>	
+			<DATAFLAG>Binary</DATAFLAG>
+		</READFILE>
+		<READFILE><!-- 把一个文件按文本的方式读取到替代符中 -->
+			<FILENAME>@PATH\测试文件.txt</FILENAME>
+			<VALNAME>@P2</VALNAME>	
+			<DATAFLAG>Text</DATAFLAG>
+		</READFILE>
+		<PARAMETER><!-- 这里是第一个参数，对应C1列 --><!-- 绑定参数时，参数值指定一定要放在绑定之前 -->
+			<TYPE>IN</TYPE>
+			<DATATYPE>BINARY</DATATYPE>
+			<VAL>@P1</VAL><!-- 在这里指定替代符的名称 -->
+		</PARAMETER>		
+		<PARAMETER><!-- 这里是第二个参数，对应C2列 -->
+			<TYPE>IN</TYPE>
+			<DATATYPE>CHAR</DATATYPE>
+			<VAL>@P2</VAL>
+		</PARAMETER>
+		<LOOP>
+			<TIMES>3</TIMES>
+			<SQL> INSERT INTO T1(C, C1, C2) VALUES(@TIMES, ?, ?) </SQL>
+		</LOOP>
+		<CLEARPARAMETERS></CLEARPARAMETERS>
+	</SQL_CASE>
+	<SQL_CASE><!-- 插入数据以后，下面脚本将把插入的值读出来跟预期的大字段值相匹配 -->
+		<SQL> SELECT C, C1, C2 FROM T1; </SQL>
+		<OPEN>
+			<LOOP>
+				<FETCHNEXT></FETCHNEXT>
+				<IF>@FETCHNEXT = 0</IF>
+				<BREAK></BREAK>
+				<ELSE>
+					<DATACOMPARE>
+						<DATA1>@P1</DATA1>
+						<DATA2>@C1</DATA2>
+						<DATAFLAG>Binary</DATAFLAG>
+					</DATACOMPARE>
+					<DATACOMPARE>
+						<DATA1>@P2</DATA1>
+						<DATA2>@C2</DATA2>
+						<DATAFLAG>Text</DATAFLAG>
+					</DATACOMPARE>
+				</ELSE>
+			</LOOP>
+		</OPEN>
+	</SQL_CASE>
+	<SQL_CASE><!-- 我们还可以把大字段提取出来保存到文件 -->
+		<SQL> SELECT C, C1, C2 FROM T1; </SQL>
+		<OPEN>
+			<LOOP>
+				<FETCHNEXT></FETCHNEXT>
+				<IF>@FETCHNEXT = 0</IF>
+				<BREAK></BREAK>
+				<ELSE>
+					<CREATEFILE>
+						<FILENAME>@PATH\C1_@C.txt</FILENAME><!-- 指定保存到跟本脚本在同一个目录下 -->
+						<WRITEFLAG>CreateNew</WRITEFLAG><!-- 除了Additional以外的值，都会创建一个新的文件，而Additional则是追加到现有的文件末尾 -->
+						<DATAFLAG>Binary</DATAFLAG>
+						<VAL>@C1</VAL>
+					</CREATEFILE>
+					<CREATEFILE>
+						<FILENAME>@PATH\C2_@C.txt</FILENAME><!-- 指定保存到跟本脚本在同一个目录下 -->
+						<WRITEFLAG>CreateNew</WRITEFLAG><!-- 除了Additional以外的值，都会创建一个新的文件，而Additional则是追加到现有的文件末尾 -->
+						<DATAFLAG>Text</DATAFLAG>
+						<VAL>@C2</VAL>
+					</CREATEFILE>
+				</ELSE>
+			</LOOP>
+		</OPEN>
+	</SQL_CASE>
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

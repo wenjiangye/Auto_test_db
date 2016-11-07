@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1								孙峰		2009-7-21						
+-->
+<!--
+	测试点列表
+	1.		
+-->
+<SQLTEST>
+	<CONTENT> 把一个大字段插入到数据库中 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<TestPointBegin> 测试点1：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> drop table t1 cascade; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t1(c int primary key, c1 blob, c2 clob); </SQL>
+		<BINARY><!-- 创建一个二进制数据，以便插入到数据库中 -->
+			<VALNAME>@P1</VALNAME>
+			<DATASIZE><EXP>1024*1024*10</EXP></DATASIZE><!-- 创建的二进制数据内容大小为10M -->
+			<SEED>10</SEED><!-- 设置二进制第一个字节的起始值，然后它会按字节往后加，后一个字节的值都会比前一个字节大1，当加满255时，又重新从0开始加 -->
+		</BINARY>
+		<SMES>@P1</SMES>
+		<P2>1234567890</P2><!-- 下面创建一个大的字符串数据 -->
+		<LOOP>
+			<TIMES>10</TIMES><!-- 在初始字符串的基础上，不断的叠加10，就是2的10次方，这样子加出来的数据长度应该是10*1024，也就是10K -->
+			<P2>@P2</P2>
+		</LOOP>
+		<PARAMETER><!-- 这里是第一个参数，对应C1列 --><!-- 绑定参数时，参数值指定一定要放在绑定之前 -->
+			<TYPE>IN</TYPE>
+			<DATATYPE>BINARY</DATATYPE>
+			<VAL>@P1</VAL><!-- 在这里指定替代符的名称 -->
+		</PARAMETER>		
+		<PARAMETER><!-- 这里是第二个参数，对应C2列 -->
+			<TYPE>IN</TYPE>
+			<DATATYPE>CHAR</DATATYPE>
+			<VAL>@P2</VAL>
+		</PARAMETER>
+		<LOOP>
+			<TIMES>3</TIMES>
+			<SQL> INSERT INTO T1(C, C1, C2) VALUES(@TIMES, ?, ?) </SQL>
+		</LOOP>
+		<CLEARPARAMETERS></CLEARPARAMETERS>
+	</SQL_CASE>
+	<SQL_CASE><!-- 插入数据以后，下面脚本将把插入的值读出来跟预期的大字段值相匹配 -->
+		<SQL> SELECT C, C1, C2 FROM T1; </SQL>
+		<OPEN>
+			<LOOP>
+				<FETCHNEXT></FETCHNEXT>
+				<IF>@FETCHNEXT = 0</IF>
+				<BREAK></BREAK>
+				<ELSE>
+					<DATACOMPARE>
+						<DATA1>@P1</DATA1>
+						<DATA2>@C1</DATA2>
+						<DATAFLAG>Binary</DATAFLAG>
+					</DATACOMPARE>
+					<DATACOMPARE>
+						<DATA1>@P2</DATA1>
+						<DATA2>@C2</DATA2>
+						<DATAFLAG>Text</DATAFLAG>
+					</DATACOMPARE>
+				</ELSE>
+			</LOOP>
+		</OPEN>
+	</SQL_CASE>
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

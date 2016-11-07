@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1								孙峰		2005/05/06						
+-->
+<!--
+	测试点列表
+	1.		
+-->
+<SQLTEST>
+	<CONTENT> 该脚本是用来演示如何用事务关键字（NEWTRANS）写一个测试死锁的脚本 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<!-- +++++++++++++++++++++ 测试点1：开始 +++++++++++++++++++++ -->
+	<SQL_CASE><!-- 在主脚本中创建两个测试表 -->
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE>
+		<SQL> DROP TABLE T1 CASCADE; </SQL>
+		<SQL> DROP TABLE T2 CASCADE; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE>
+		<SQL> CREATE TABLE T1(C0 INT PRIMARY KEY, C1 INT) </SQL>
+		<SQL> CREATE TABLE T2(C0 INT PRIMARY KEY, C1 INT) </SQL>
+	</SQL_CASE>
+	<NEWTRANS></NEWTRANS><!-- 创建一个事务进程，它的ID为0 -->
+	<NEWTRANS></NEWTRANS><!-- 创建一个事务进程，它的ID为1(如果下面还有NEWTRANS关键字创建的事务进程，那么ID号往下类推) -->
+	<TRANS0>
+		<BEGINTRANS></BEGINTRANS><!-- 开始事务 -->
+		<SQL> INSERT INTO T1(C0, C1) VALUES(1, 1)</SQL><!-- 事务一，住T1中插入一行，不提交 -->
+	</TRANS0>
+	<SLEEP>1000</SLEEP><!-- 挂起1秒再发送事务的脚本, 确保事务的脚本有充分的时间被执行 -->
+	<TRANS1>
+		<BEGINTRANS></BEGINTRANS><!-- 开始事务 -->
+		<SQL> INSERT INTO T2(C0, C1) VALUES(1, 1)</SQL><!-- 事务二，住T2中插入一行，不提交 -->
+	</TRANS1>
+	<SLEEP>1000</SLEEP><!-- 挂起1秒再发送事务的脚本, 确保事务的脚本有充分的时间被执行 -->
+	<TRANS0>
+		<SQL> INSERT INTO T2(C0, C1) VALUES(1, 1)</SQL><!-- 事务一，住T2中插入一行，这一行的值跟事务二插入的值相同，不提交 -->
+	</TRANS0>
+	<SLEEP>1000</SLEEP><!-- 挂起1秒再发送事务的脚本, 确保事务的脚本有充分的时间被执行 -->
+	<TRANS1><!-- 产生死锁 -->
+		<SQLSTATE> 25000 </SQLSTATE><!-- 无效事务状态 -->
+		<NERROR> -3003</NERROR><!-- 死锁 -->
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->		
+		<SQL> INSERT INTO T1(C0, C1) VALUES(1, 1)</SQL><!-- 事务二，住T1中插入一行，这一行的值跟事务一插入的值相同，这个时候就会造成死锁-->
+		<ENDTRANS>ROLLBACK</ENDTRANS><!-- 回滚ID号为1的事务-->
+	</TRANS1>
+	<TRANS0>
+		<ENDTRANS>ROLLBACK</ENDTRANS><!-- 回滚ID号为0的事务-->
+	</TRANS0>
+
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			<SQL> DROP TABLE T1 </SQL>
+			<SQL> DROP TABLE T2 </SQL>
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+																	
+-->
+<!--
+	测试点列表
+	1.		
+-->
+<SQLTEST>
+	<CONTENT>  </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<!-- +++++++++++++++++++++ 测试点1：开始 +++++++++++++++++++++ -->
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果，在初始化环境的时候很有用 -->
+		<SQL> CREATE TABLE TEST(C INT); </SQL>
+		<SQL> CREATE TABLE TEST(C INT); </SQL>
+		<SQL> DROP TABLE TEST; </SQL>
+		
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> CREATE TABLE TEST(C INT); </SQL>
+		
+		
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+		<SQL> DROP TABLE TEST; </SQL>			
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

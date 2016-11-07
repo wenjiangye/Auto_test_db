@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+																	
+-->
+<!--
+	测试点列表
+	1.		
+-->
+<SQLTEST>
+	<LEVEL>0</LEVEL>
+	<CONTENT>  </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<!-- +++++++++++++++++++++ 测试点1：开始 +++++++++++++++++++++ -->
+	<CONNECT> 0 </CONNECT>
+	<SQL_CASE><!-- 输入参数 -->
+		<SQL> CREATE OR REPLACE PROCEDURE P1(C INT) AS BEGIN C:=3; END; </SQL>	
+		<SQLSTR>1</SQLSTR>	
+		<PARAMETER><!-- 绑定参数时，参数值指定一定要放在绑定之前 -->
+			<TYPE>IN</TYPE>
+			<DATATYPE>INT</DATATYPE>
+			<VAL>@SQLSTR</VAL><!-- 输出参数的值会存放到@SQLSTR中 -->
+		</PARAMETER>		
+		<SQL> CALL P1(?) </SQL>
+		<CLEARPARAMETERS></CLEARPARAMETERS>
+	</SQL_CASE>
+	<SQLSTR></SQLSTR>	
+	<SQL_CASE><!-- 输入输出参数 -->
+		<SQL> CREATE OR REPLACE PROCEDURE P1(C IN OUT VARCHAR(100)) AS BEGIN C:=C+'B'; END; </SQL>	
+		<SQLSTR>A</SQLSTR>	
+		<PARAMETER>
+			<TYPE>IN OUT</TYPE>
+			<SIZE>20</SIZE>
+			<DATATYPE>VARCHAR</DATATYPE>
+			<VAL>@SQLSTR</VAL><!-- 输出参数的值会存放到@SQLSTR中 -->
+		</PARAMETER>		
+		<SQL> CALL P1(?) </SQL>
+		<SQL_CASE>
+			<IF>BOOL:'@SQLSTR'='AB'</IF>
+			<SMES>输出参数的值正确</SMES>
+			<ELSE>
+				<FMES>输出参数的值错误， 预期值应该是:AB,实际输出:@SQLSTR</FMES>
+			</ELSE>
+		</SQL_CASE>
+		
+		<CLEARPARAMETERS></CLEARPARAMETERS>
+	</SQL_CASE>
+	<SQLSTR></SQLSTR>
+	<SQL_CASE><!-- 输出参数 -->
+		<SQL> CREATE OR REPLACE PROCEDURE P1(C OUT INT) AS BEGIN C:=3; END; </SQL>	
+		<SQLSTR>1</SQLSTR>	
+		<PARAMETER>
+			<TYPE>OUT</TYPE>
+			<SIZE>20</SIZE>
+			<DATATYPE>INT</DATATYPE>
+			<VAL>@SQLSTR</VAL><!-- 输出参数的值会存放到@SQLSTR中 -->
+		</PARAMETER>		
+		<SQL> CALL P1(?) </SQL>
+		<SQL_CASE>
+			<IF>BOOL:'@SQLSTR'='3'</IF>
+			<SMES>输出参数的值正确</SMES>
+			<ELSE>
+				<FMES>输出参数的值错误， 预期值应该是:3,实际输出:@SQLSTR</FMES>
+			</ELSE>
+		</SQL_CASE>		
+		<CLEARPARAMETERS></CLEARPARAMETERS>
+	</SQL_CASE>
+	<SQLSTR></SQLSTR>
+	<SQL_CASE><!-- 返回值参数 -->
+		<SQL> CREATE OR REPLACE FUNCTION F1 RETURN INT AS BEGIN RETURN 3; END; </SQL>	
+		<SQLSTR>1</SQLSTR>	
+		<PARAMETER>
+			<TYPE>RETURN TYPE</TYPE>
+			<SIZE>20</SIZE>
+			<DATATYPE>INT</DATATYPE>
+			<VAL>@SQLSTR</VAL><!-- 输出参数的值会存放到@SQLSTR中 -->
+		</PARAMETER>		
+		<SQL> {? = call F1()}</SQL>
+		<SQL_CASE>
+			<IF>BOOL:'@SQLSTR'='3'</IF>
+			<SMES>输出参数的值正确</SMES>
+			<ELSE>
+				<FMES>输出参数的值错误， 预期值应该是:3,实际输出:@SQLSTR</FMES>
+			</ELSE>
+		</SQL_CASE>		
+		<CLEARPARAMETERS></CLEARPARAMETERS>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+	<SQLSTR></SQLSTR>
+	<SQL_CASE><!-- 返回值参数 -->
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE>
+		<SQL> DROP TABLE T1 CASCADE; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE>
+		<SQL> CREATE TABLE T1(C INT PRIMARY KEY, C1 INT) </SQL>
+		<SQL> INSERT INTO T1(C, C1) VALUES(1, 11) </SQL>		
+		<SQLSTR>1</SQLSTR>	
+		<PARAMETER>
+			<TYPE>IN</TYPE>
+			<SIZE>20</SIZE>
+			<DATATYPE>INT</DATATYPE>
+			<VAL>@SQLSTR</VAL><!-- 输出参数的值会存放到@SQLSTR中 -->
+		</PARAMETER>	
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE>	
+		<SQL> SELECT * FROM T1 WHERE C=?</SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>1</COLUMN><COLUMN>11</COLUMN>
+			</RECORD>
+		</RESULT>
+		<CLEARPARAMETERS></CLEARPARAMETERS>
+	</SQL_CASE>
+	<SQL_CASE><!-- 使用参数一次绑定多次执行 -->
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE>
+		<SQL> DROP TABLE T1 CASCADE; </SQL>
+		<SQL> CREATE TABLE T1(C INT PRIMARY KEY, C1 VARCHAR(100)) </SQL>
+		<PARAMETER>
+			<TYPE>IN</TYPE>
+			<DATATYPE>INT</DATATYPE>
+			<VAL>@SQLSTR1</VAL><!-- 输出参数的值会存放到@SQLSTR中 -->
+		</PARAMETER>
+		<PARAMETER>
+			<TYPE>IN</TYPE>
+			<DATATYPE>VARCHAR</DATATYPE>
+			<VAL>@SQLSTR2</VAL><!-- 输出参数的值会存放到@SQLSTR中 -->
+		</PARAMETER>
+		<SQLSTR></SQLSTR>
+		<SQLSTR>100</SQLSTR>
+		<LOOP>
+			<TIMES>@SQLSTR</TIMES>
+			<SQLSTR1></SQLSTR1><!-- 先清空原来绑定的参数值 -->
+			<SQLSTR2></SQLSTR2>
+			<SQLSTR1>@TIMES</SQLSTR1><!-- 重新指定绑定的参数值 -->
+			<SQLSTR2>@TIMES abcdefg</SQLSTR2>
+			<SQL> INSERT INTO T1(C, C1) VALUES(?, ?) </SQL>
+		</LOOP>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE><!-- 判断一下执行的结果 -->
+		<SQL> SELECT * FROM T1; </SQL>
+		<RESULT>
+			<RECORDNUMS>@SQLSTR</RECORDNUMS>
+			<RECORD>
+				<COLUMN>@RECORDNUMS</COLUMN><COLUMN>@RECORDNUMS abcdefg</COLUMN>
+			</RECORD>
+		</RESULT>
+		
+	</SQL_CASE>
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+					
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

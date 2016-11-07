@@ -1,0 +1,232 @@
+VC快捷键大全2006-10-18 14:01F1： 帮助
+Ctrl+O   ：Open
+Ctrl+P   ：Print
+Ctrl+N   ：New
+Ctrl+Shift+F2 ：清除所有书签
+F2    ：上一个书签
+Shift+F2  ：上一个书签
+Alt+F2   ：编辑书签
+Ctrl＋F2  ：添加/删除一个书签
+F12    ：Goto definition
+Shift+F12  ：Goto reference
+Ctrl+'Num+'  ：Displays the next symbol definition or reference
+Ctrl+'Num-'  ：Displays the previous symbol definition or reference
+Ctrl+J/K  ：寻找上一个/下一个预编译条件
+Ctrl+Shift+J/K ：寻找上一个/下一个预编译条件并将这一块选定
+Ctrl+End  ：文档尾
+Ctrl+Shift+End ：选定从当前位置到文档尾
+Ctrl+Home  ：文档头
+Ctrl+Shift+Home ：选定从当前位置到文档头
+Ctrl+B/Alt+F9 ：编辑断点
+Alt+F3/Ctrl+F ：查找
+F3    ：查找下一个
+Shift+F3  ：查找上一个
+Ctrl+]/Ctrl+E ：寻找下一半括弧
+Ctrl+Shift+] ：寻找下一半括弧并选定括弧之间的部分（包括括弧）
+Ctrl+Shift+E ：寻找下一半括弧并选定括弧之间的部分（包括括弧）
+F4    ：寻找下一个错误/警告位置
+Shift+F4  ：寻找上一个错误/警告位置
+Shift+Home  ：选定从当前位置到行首
+Shift+End  ：选定从当前位置到行尾
+Ctrl+L   ：剪切当前行
+Ctrl+Shift+L ：删除当前行
+Alt+Shift+T  ：交换当前行和上一行
+Ctrl+Alt+T  ：Brings up the completion list box
+Shift+PageDown ：选定从当前位置到下一页当前位置
+Shift+PageUp ：选定从当前位置到上一页当前位置
+Ctrl+Shift+Space：显示函数参数的Tooltip
+Ctrl+Z/Alt+Backspace ：Undo
+Ctrl+Shift+Z/Ctrl+Y ：Redo
+F8    ：当前位置变成选定区域的头/尾（再移动光标或者点鼠标就会选定）
+Ctrl+Shift+F8 ：当前位置变成矩形选定区域的头/尾（再移动光标或者点鼠标就会选定）
+Alt+F8   ：自动格式重排
+Ctrl+G   ：Goto
+Ctlr+X/Shift+Del：Cut
+Ctrl+C/Ctrl+Ins ：Copy
+Ctrl+V/Shift+Ins：Paste
+Ctrl+U   ：将选定区域转换成小写
+Ctrl+Shift+U ：将选定区域转换成大写
+Ctrl+F8   ：当前行变成选定区域的头/尾（再移动上下光标或者点鼠标就会选定多行）
+Ctrl+Shift+L ：删除从当前位置到行尾
+Ctrl+Shift+8 ：将所有Tab变成`或者还原
+Ctrl+T   ：显示变量类型
+Ctrl+↑   ：向上滚屏
+Ctrl+↓   ：向下滚屏
+Ctrl+Del  ：删除当前单词的后半截（以光标为分割）
+Ctrl+Backspace ：删除当前单词的前半截（以光标为分割）
+Ctrl+←   ：移到前一个单词
+Ctrl+→   ：移到后一个单词
+Ctrl+Shift+← ：选定当前位置到前一个单词
+Ctrl+Shift+→ ：选定当前位置到后一个单词
+Ctrl+Shift+T ：将本单词和上一个单词互换 
+Alt+0   ：Workspace Window
+Alt+2   ：Output Window
+Alt+3   ：Watch Window
+Alt+4   ：Variables Window
+Alt+5   ：Registers Window
+Alt+6   ：Memory Window
+Alt+7   ：CallStack Window
+Alt+8   ：Disassembly Window
+Ctrl+W   ：ClassWizard
+Alt+Enter  ：属性
+Alt+F7   ：Project Settings
+F7    ：Build
+Ctrl+F7   ：Compile
+Ctrl+F5   ：Run
+Ctrl+Break  ：Stops the build
+F5    ：Go
+Ctrl+F10  ：Run to cursor
+F11    ：step into
+Alt+F10   ：Apply codes changes
+Ctrl+F9   ：Enable/Disable a breakpoint
+Alt+F11   ：将 Memory Window 切换到下一种显示模式
+Alt+Shift+F11 ：将 Memory Window 切换到上一种显示模式
+Ctrl+Shift+F9 ：去掉所有断点
+Ctrl+Shift+F5 ：Restarts the program
+Ctrl+Shift+F10 ：将当前行设为下一条指令执行的行
+Alt+Num*  ：滚动到当前指令
+Shift+F11  ：跳出当前函数
+F9    ：断点
+F10    ：step over
+Shift+F5  ：停止 Debugging
+Ctrl+F11  ：Switches between the source view and the disassembly view for this instruction
+Alt+F12   ：Queries on the selected object or current context
+Alt+F6   ：Toggles the docking feature for the window on/off
+Shift+Esc  ：隐藏窗口 
+Ctrl+Shift+G ：？
+Ctrl+*   ：打开string table
+Ctrl+Space  ：？
+Ctrl+F3   ：向下查找下一个
+Ctrl+Shift+F3 ：查找上一个
+Ctrl+D   ：查找
+Ctrl+I   ：向下查找下一个
+Ctrl+Shift+I ：查找上一个
+F6    ：？Activates the next pane
+Shift+F6  ：？Activates the previous pane
+Ctrl+M   ：？Detects duplicate mnemonics in the resource
+Alt +O : 头文件与cpp文件的交互显示
+================================================================================
+
+           F1 显示帮助,如果光标停在代码的某个字符上,显示MSDN中相应的帮助内容
+
+           F2 书签功能: Ctrl+F2 --在某行设置一个书签(再按一次次是取消)
+
+           F2 --跳到下一个书签位置
+
+           Shift+F2 --跳到上一个书签位置
+
+           Ctrl+Shift+F2 --删除所有书签
+
+           F3 查找: Ctrl+F3 --在文件中查找,如果当前光标在一个字符串上,
+
+           那么自动查找此字符串.相似的有Ctrl+F
+
+           F3 --查找文件中下一个串
+
+           Shift+F3 --查找文件中上一个串
+
+           F4(不是流行花园那个) 如果是编译后或者Find in Files后,可以逐条定位.
+
+           Ctrl+F4 --关闭文件
+
+           Alt+F4 --关闭VC(跟WINDOWS定义的一样)
+
+           F5编译并执行 F5 --编译并通过VC执行
+
+           Ctrl+F5 --不经过VC,直接执行编译后的exe
+
+           Shift+F5 --F5运行后,直接从VC中停止程序(可以模拟当机情况)
+
+           Ctrl+Shift+F5 --重新开始运行
+
+           F6切换窗口 SplitWindow后,可以转换光标所在的窗口
+
+           F7编译 F7 编译工程
+
+           Ctrl+F7 编译当前文件
+
+           Alt+F7 工程设置对话框
+
+           F8选择的粘滞键 其实更常用的是按住Shift+方向键
+
+           Alt+F8 选中的代码书写格式对齐
+
+           F9设置断点 Ctrl+F9删除所有断点
+
+           Alt+F9 显示编辑断点的对话框
+
+           Ctrl+F9断点无效
+
+           F10单步执行(Debug时)
+
+           Ctrl+F10 执行到光标所在行
+
+          (试试看Shift+F10什么效果)
+
+           F11跟踪时进入函数内部
+
+           Shift+F11跳到上一层调用栈
+
+           F12跳到函数定义初(需要带Browse Info选项编译,建议不选,生成文件很大)
+
+     编辑常用
+
+           Ctrl+W 显示ClassWizard,边界面程序用的比较多
+
+           Ctrl+Z/Ctrl+Y Undo/Redo
+
+           Ctrl+U 字母转化为小写(有的VC没有设置)
+
+           Ctrl+Shift+U 字母转化为大写(有的VC没有设置)
+
+           Ctrl+S 保存(强烈建议编码时经常按两下,省得掉电死机时后悔,呵呵,该键在多数编辑软件都适用)
+
+           Ctrl+D 查找(嗯,如果有SOFTICE,那么就是呼叫它了)
+
+           Ctrl+F 正宗的查找快捷键
+
+           Ctrl+G 跳到文件中第n行
+
+           Ctrl+Shift+G 光标在一个文件名上,直接跳到指定文件
+
+           Ctrl+H 替换
+
+           Ctrl+J,K #ifdef...#endif查找配对
+
+           Ctrl+L 剪切一行
+
+           Ctrl+} 匹配括号(),{}
+
+     调试常用
+
+           Shift+F9 QuickWatch,并显示关标所在处的变量值
+
+           Alt+3 Watch 查看窗口
+
+           Alt+4 Variables 监视变量(常用)
+
+           Alt+5 显示寄存器
+
+           Alt+6 显示内存(常用)
+
+           Alt+7 显示堆栈情况(当机了多看看)
+
+           Alt+8 显示汇编码
+
+     还有一些常用的
+
+           Ctrl+TAB 切换打开的文件视图,(如果按住Ctrl,顺序向后切换)
+
+           Ctrl+Shift+TAB切换打开的文件视图,(如果按住Ctrl,顺序向前切换)
+
+           TAB 选中后,整体后移一个制表符,
+
+           Shift+TAB 选中后,整体前移一个制表符,
+
+           Alt+0 将焦点移到工作区(ESC回编辑区)
+
+           Alt+2 将焦点移到输出区(ESC回编辑区)
+
+           Ctrl+PgUp 逆序切换工作区视图
+
+           Ctrl+PgDn 顺序切换工作区视图 

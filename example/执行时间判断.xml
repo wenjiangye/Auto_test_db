@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1								孙峰		2007-10-9						
+-->
+<!--
+	测试点列表
+	1.		
+-->
+<SQLTEST>
+	<CONTENT> 语句执行时间对比（@USEDTIMES） </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<!-- +++++++++++++++++++++ 测试点1：开始 +++++++++++++++++++++ -->
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> DROP TABLE T1; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> CREATE TABLE T1(C INT, C1 INT); </SQL>
+		<LOOP>
+			<NOSHOW></NOSHOW>
+			<TIMES>10000</TIMES>
+			<SQL> INSERT INTO T1 VALUES(@TIMES, @TIMES); </SQL>			
+		</LOOP>
+		<SQL> SELECT * FROM T1 WHERE C=10000; </SQL><!-- 在没有建索引的情况下执行，保存其执行时间 -->
+		<SMES>@USEDTIMES</SMES>
+		<SQLSTR></SQLSTR><!-- 清空@SQLTR -->
+		<SQLSTR>@USEDTIMES</SQLSTR><!-- 保存上一次查询执行的时间到@SQLSTR中，当然，我们还可以用SETVAL关键字来保存多个执行时间，然后通过GETVAL再取出来 -->				
+	</SQL_CASE>
+	<SQL_CASE>
+		<SQL> CREATE INDEX IT1C ON T1(C) </SQL><!-- 建索引 -->
+		<SQL> SELECT * FROM T1 WHERE C=566; </SQL><!-- 在有建索引的情况下执行，其执行时间应该要比不建索引来的少 -->
+		<IF>BOOL:@USEDTIMES&lt;@SQLSTR</IF><!-- 判断两次执行时间的大小，如果第二次小于第一次，那么测试才算是成功 -->
+		<SMES>创建索引来提提升性能成功</SMES>
+		<ELSE>
+			<FMES>创建索引来提提升性能失败, 第一次使用了@SQLSTR毫秒，第二次用了@USEDTIMES毫秒</FMES>
+		</ELSE>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

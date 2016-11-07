@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1								孙峰		2007-10-9						
+-->
+<!--
+	测试点列表
+	1.		
+-->
+<SQLTEST>
+	<CONTENT> 获取ini文件中某个参数的值，并判断它是否为预期的值，然后做出相应的测试 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<!-- +++++++++++++++++++++ 测试点1：开始 +++++++++++++++++++++ -->
+	<GETDMINI>
+		<INIPATH> @SERVERPATH\dm.ini</INIPATH><!-- ini文件在服务器的目录下面 -->
+		<VALNAME> ENABLE_AUDIT </VALNAME>
+		<VAL> @SQLSTR </VAL>
+	</GETDMINI>
+	<SQL_CASE>
+		<IF> @SQLSTR=1 </IF>
+		<SQL_CASE>
+			<!-- 如果成立，则在这里做某些事 -->
+		</SQL_CASE>
+		<ELSE>
+			<SQL_CASE>
+				<SQL> SELECT SET_AUDIT(1); </SQL>				
+			</SQL_CASE>
+		</ELSE>
+	</SQL_CASE>
+	
+	<GETDMINI>
+		<INIPATH> @PATH\dm.ini</INIPATH><!-- ini文件在当前xml脚本的目录下面，如果你不想使用相对路径，也可以在这个关键这中指定全路径 -->
+		<VALNAME> ENABLE_AUDIT </VALNAME>
+		<VAL> @SQLSTR </VAL>
+	</GETDMINI>
+	<SQL_CASE>
+		<IF> @SQLSTR=1 </IF>
+		<SQL_CASE>
+			<!-- 如果成立，则在这里做某些事 -->
+		</SQL_CASE>
+		<ELSE>
+			<SQL_CASE>
+				<SQL> SELECT SET_AUDIT(1); </SQL>				
+			</SQL_CASE>
+		</ELSE>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

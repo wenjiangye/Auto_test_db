@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1								孙峰		2007-10-9						
+-->
+<!--
+	测试点列表
+	1.		
+-->
+<SQLTEST>
+	<CONTENT> 文件操作，这些关键字可以帮你构造一些文件错误的运行环境，比如删除某个数据文件，某个备份文件再做相应操作等等 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<!-- +++++++++++++++++++++ 测试点1：开始 +++++++++++++++++++++ -->
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<DELFILE> @PATH\xxx.tmp </DELFILE>
+		<DELFILE> @PATH\xxx1.tmp </DELFILE>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->		
+		<CREATEFILE><!-- 创建一个文件 -->
+			<FILENAME>@PATH\xxx.tmp</FILENAME><!-- 在当前脚本的目录下创建一个文件 -->
+			<WRITEFLAG>Additional</WRITEFLAG>
+			<VAL>这段文字会被追加到文件xxx.tmp中</VAL>
+		</CREATEFILE>
+		<COPYFILE>
+			<OLDFILE>@PATH\xxx.tmp</OLDFILE>
+			<NEWFILE>@PATH\xxx1.tmp</NEWFILE>
+		</COPYFILE>
+		<DELFILE> @PATH\xxx.tmp </DELFILE>
+		<DELFILE> @PATH\xxx1.tmp </DELFILE>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

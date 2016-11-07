@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1		编写			创建			孙峰		2009-3-17						
+-->
+<!--
+	测试点列表
+	1.		
+-->
+<SQLTEST>
+	<CONTENT> 比较结果集中的行数是否跟预期一致 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<TestPointBegin> 方法一，通过新增的RESULTROWS关键字，需要把XML运行工具版本升级至1.0.7.0以上 </TestPointBegin>
+	<SQL_CASE>
+		<SQL> SELECT TOP 10 ID FROM SYSDBA.SYSTABLES; </SQL>
+		<RESULTROWS>10</RESULTROWS>
+	</SQL_CASE>
+	<TestPointBegin> 方法二，通过替代符比较 </TestPointBegin>
+	<SQL_CASE>
+		<SQLSTR>FromSql: SELECT count(ID) FROM SYSDBA.SYSTABLES where id&lt;10; </SQLSTR>
+		<IF>@SQLSTR &lt;&gt;10</IF>
+		<FMES>预期的结果集行数不一致：预期 10 行，实际返回 @SQLSTR 行</FMES>
+	</SQL_CASE>
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

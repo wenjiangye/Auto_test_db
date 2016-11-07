@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1								孙峰		2007-9-7							
+-->
+<!--
+	测试点列表
+	1.		
+-->
+<SQLTEST>
+	<CONTENT> 示范使用IF ELSE关键字 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<!-- +++++++++++++++++++++ 测试点1：开始 +++++++++++++++++++++ -->
+	<SQL_CASE><!-- 简单的表达式判断 -->
+		<SQLSTR>1</SQLSTR>
+		<SQLSTR1>1</SQLSTR1>
+		<IF> BOOL:@SQLSTR&lt;&gt;@SQLSTR1 </IF><!-- 两个整数如果不相等 -->
+		<SQL_CASE>
+			<SQL> SELECT 1; </SQL>			
+		</SQL_CASE>
+		<ELSE>
+			<SQL>SELECT 2;</SQL>
+		</ELSE>
+	</SQL_CASE>
+	<SQL_CASE><!-- IF的单独使用 -->
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE>
+		<SQL> CREATE TABLE T1(C INT PRIMARY KEY, C1 INT) </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE>
+		<IF> FromSql:SELECT TOP 1 * FROM SYSTABLES WHERE NAME ='T1' </IF><!-- 如果执行的是结果集生成语句，那么，只要有一行返回，就算条件成立，没有行，就算失败 --><!-- 可以这样判断一下是否存在表T1，如果存在，则执行IF下面的脚本 -->
+		<SQL_CASE>
+			<SQL> DROP TABLE T1; </SQL>			
+		</SQL_CASE>
+	</SQL_CASE>
+	
+	<SQL_CASE><!-- IF ELSE的组合使用 -->
+		<IF> FromSql:SELECT TOP 1 * FROM SYSTABLES WHERE NAME ='T1'</IF><!-- 可以这样判断一下是否存在表T1，如果不存在，则执行ELSE下面的脚本来创建表T1 -->
+		<SQL_CASE>
+			<SQL> DROP TABLE T1; </SQL>			
+		</SQL_CASE>
+		<ELSE>
+			<SQL_CASE>
+				<SQL> CREATE TABLE T1(C INT PRIMARY KEY, C1 INT) </SQL>
+			</SQL_CASE>
+		</ELSE>
+	</SQL_CASE>
+	<SQL_CASE><!-- 多个IF+一个ELSE的使用，就是相当于&&操作符 -->
+		<IF> FromSql:SELECT TOP 1 1 FROM SYSTABLES WHERE NAME ='T1'</IF><!-- 可以这样判断一下是否存在表T1 -->
+		<IF> FromSql:SELECT TOP 1 1 FROM SYSTABLES WHERE NAME ='T2'</IF><!-- 可以这样判断一下是否存在表T2 -->
+		<SQL_CASE>
+			<SQL> SELECT * FROM T1,T2; </SQL>			
+		</SQL_CASE>
+		<ELSE>
+			<SQL_CASE>
+				<IF> FromSql:SELECT TOP 1 1 FROM SYSTABLES WHERE NAME ='T1'</IF><!-- 再次用判断来创建T1表 -->
+				<ELSE>
+					<SQL> CREATE TABLE T1(C INT PRIMARY KEY, C1 INT) </SQL>
+				</ELSE>
+			</SQL_CASE>
+			<SQL_CASE>
+				<IF> FromSql:SELECT TOP 1 1 FROM SYSTABLES WHERE NAME ='T2'</IF><!-- 再次用判断来创建T2表 -->
+				<ELSE>
+					<SQL> CREATE TABLE T2(C INT PRIMARY KEY, C1 INT) </SQL>
+				</ELSE>
+			</SQL_CASE>
+		</ELSE>
+	</SQL_CASE>
+	<SQL_CASE>
+		<IF>FromSql:INSERT INTO T1 VALUES(1, 1)</IF><!-- 如果不是查询语句，那么，直要能正确的执行，IF条件就算是成立 -->
+	</SQL_CASE>
+	<SQL_CASE>
+		<IF>FromSql:INSERT INTO T1 VALUES(1, 1)</IF><!-- 如果不是查询语句，执行报错就算是失败了，跳到ELSE执行 -->
+		<ELSE>
+			<SQL> DELETE FROM T1; </SQL>			
+		</ELSE>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

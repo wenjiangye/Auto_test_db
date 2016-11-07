@@ -1,0 +1,1280 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1		创建						朱仲颖		2007-11-29		
+	2               修改            修改测试点14、17中事务声明方式  朱仲颖          2008-3-20	
+	3               修改            去掉并发事务的连接设置          朱仲颖          2008-4-3		
+	4               修改            测试点17中设置参数的方式        朱仲颖          2008-4-17
+	5               修改            测试点1中预期的错误码	        朱仲颖          2008-8-27
+-->
+<!--
+	测试点列表
+	1.含有空值的exists查询
+	2.比较类型不同的exists查询		
+	3.exists的嵌套查询
+	4.merge join查询
+	5.带有常量比较表达式的查询
+	6.带有集函数的查询
+	7.多表不同条件组合的组合索引列查询
+	8.多表不同条件组合的单索引列查询
+	9.merge join查询
+	10.多表查询
+	11.in查询
+	12.not  in查询
+	13.指定索引连接查询、exists查询
+	14.并发控制
+	15.in、exists查询
+	16.禁止行锁、页锁查询
+	17.并发控制
+-->
+<SQLTEST>
+	<CONTENT>  </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->		
+	<TestPointBegin>测试点1：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> drop table t1 cascade; </SQL>
+		<SQL> drop table t2 cascade; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t1(c1 int,c2 int); </SQL>
+		<SQL> create index it1c1 on t1(c1); </SQL>
+		<SQL> create table t2(d1 int,d2 int); </SQL>
+		<SQL> create index it2d1 on t2(d1); </SQL>		
+	</SQL_CASE>
+	<SQL_CASE>
+		<!-- 插入数据 -->
+		<SQL> insert into t1 values(1,1); </SQL>
+		<SQL> insert into t1 values(NULL,1); </SQL>
+		
+		<SQL> insert into t2 values(2,2); </SQL>		
+	</SQL_CASE>
+	<SQL_CASE>
+		<!-- 验证 -->
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select * from t1 a where exists(select d1 from t2 b where a.c1=b.d1); </SQL>
+		<RESULT><!-- (插入的结果集是一个空结果集) -->
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select * from t1 a where not exists(select d1 from t2 b where a.c1=b.d1); </SQL>	
+		<RESULT>	
+		        <RECORD>
+				<COLUMN>1</COLUMN><COLUMN>1</COLUMN>
+			</RECORD>		
+			<RECORD>
+				<COLUMN>NULL</COLUMN><COLUMN>1</COLUMN>
+			</RECORD>			
+		</RESULT>	
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+	<TestPointBegin>测试点2：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> drop table t1 cascade; </SQL>
+		<SQL> drop table t2 cascade; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t1(c1 int,c2 int); </SQL>
+		<SQL> create index it1c1 on t1(c1); </SQL>
+		<SQL> create table t2(d1 char(5),d2 int); </SQL>
+	</SQL_CASE>
+	<SQL_CASE>
+		<!-- 插入数据 -->
+		<SQL> insert into t1 values(1,1); </SQL>
+		<SQL> insert into t1 values(2,2); </SQL>
+		
+		<SQL> insert into t2 values(&apos;abc&apos;,1); </SQL>
+		<SQL> insert into t2 values(&apos;def&apos;,2); </SQL>
+	</SQL_CASE>
+	<SQL_CASE>
+		<!-- 验证 -->
+		<NERROR> -2520 </NERROR>
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 --><!-- 字符串转换错误 -->				
+		<SQL> select c1 from t1 where exists (select d1 from t2 where c1=d1); </SQL>		
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点2：结束 - - - - - - - - - - - -->
+	<TestPointBegin>测试点3：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> drop table t1 cascade; </SQL>
+		<SQL> drop table t2 cascade; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t1(c1 int,c2 int); </SQL>
+		<SQL> create index it1c1 on t1(c1); </SQL>
+		<SQL> create or replace procedure pro1 as i int; begin for i in 1..1024 loop insert into t1 values(1,1); end loop; end; </SQL><!-- 建存储过程 -->
+		<SQL> create table t2(d1 int,d2 int); </SQL>
+	</SQL_CASE>
+	<SQL_CASE>
+		<!-- 插入数据 -->
+		<SQL> call pro1; </SQL>
+		<SQL> insert into t1 values(NULL,NULL); </SQL>
+		
+		<SQL> insert into t2 values(1,1); </SQL>
+		<SQL> insert into t2 values(2,2); </SQL>
+	</SQL_CASE>
+	<SQL_CASE>
+		<!-- 验证 -->
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select count(c1) from t1 where exists (select d2 from t2 where exists(select c1 from t1 where c1=d2)); </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>1024</COLUMN>
+			</RECORD>
+		</RESULT>		
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点3：结束 - - - - - - - - - - - -->
+	<TestPointBegin>测试点4：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> drop table t1 cascade; </SQL>
+		<SQL> drop table t2 cascade; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t1(c1 int ,c2 int); </SQL>
+		<SQL> create cluster index it1c1 on t1(c1); </SQL>
+		<SQL> create or replace procedure pro1 as i int; begin for i in 1 .. 1024 loop insert into t1 values(i,i); end loop; end; </SQL>
+		<SQL> create table t2(d1 int ,d2 int); </SQL>
+		<SQL> create cluster index it2d1 on t2(d1); </SQL>
+		<SQL> create or replace procedure pro2 as i int; begin for i in 1 .. 128 loop insert into t2 values(i,i); end loop; end; </SQL>
+	</SQL_CASE>
+	<SQL_CASE>
+		<!-- 插入数据 -->
+		<SQL> call pro1; </SQL>
+		<SQL> insert into t1 values(NULL,NULL); </SQL>
+		<SQL> call pro2; </SQL>		
+	</SQL_CASE>
+	<SQL_CASE>
+		<!-- 验证 -->
+		<SQL> select c1,d1 from t1 inner merge join t2 on c1=d1; </SQL>		
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点4：结束 - - - - - - - - - - - -->
+	<TestPointBegin>测试点5：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> drop table t1 cascade; </SQL>
+		<SQL> drop table t2 cascade; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t1(c1 int ,c2 int); </SQL>
+		<SQL> create table t2(d1 char(10),d2 char(10)); </SQL>
+	</SQL_CASE>
+	<SQL_CASE>
+		<!-- 插入数据 -->
+		<SQL> insert into t1 values(1,1); </SQL>
+		<SQL> insert into t1 values(2,2); </SQL>
+		
+		<SQL> insert into t2 values(&apos;abc&apos;,&apos;abc&apos;); </SQL>
+		<SQL> insert into t2 values(&apos;def&apos;,&apos;def&apos;); </SQL>
+	</SQL_CASE>
+	<SQL_CASE>
+		<!-- 验证 -->
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select * from t1 where 2&gt;1 and c1&gt;1; </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>2</COLUMN><COLUMN>2</COLUMN>
+			</RECORD>
+		</RESULT>
+		<NERROR> -2511 </NERROR>
+		<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->
+		<SQL> select * from t1 union select * from t2; </SQL>		
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点5：结束 - - - - - - - - - - - -->
+	<TestPointBegin>测试点6：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> drop table t1 cascade; </SQL>
+		<SQL> drop table t2 cascade; </SQL>
+		<SQL> drop table t3 cascade; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t1(c1 int ,c2 int); </SQL>
+		<SQL> create table t2(d1 int,d2 int); </SQL>
+		<SQL> create table t3(e1 int,e2 int); </SQL>
+	</SQL_CASE>
+	<SQL_CASE>
+		<!-- 插入数据 -->
+		<SQL> insert into t1 values(1,1); </SQL>
+		<SQL> insert into t1 values(2,2); </SQL>
+		
+		<SQL> insert into t2 select * from t1; </SQL>
+		<SQL> insert into t3 select * from t1; </SQL>
+	</SQL_CASE>
+	<SQL_CASE>
+		<!-- 验证 -->
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select max(distinct(c1+c2)),min(d1) from t1,t2 where d2&gt;0; </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>4</COLUMN><COLUMN>1</COLUMN>
+			</RECORD>
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select count(*),count(c1),max(distinct(c1+c2)) from t1; </SQL>	
+		<RESULT>
+			<RECORD>
+				<COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>4</COLUMN>
+			</RECORD>
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select max(distinct(c1+c2)),min(d1) from t1 inner hash join t2 on c1=d1; </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>4</COLUMN><COLUMN>1</COLUMN>
+			</RECORD>
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select max(distinct(c1+c2)),min(c1),count(c2) from t1 where exists(select d1 from t2 where min(c1)=d1); </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>4</COLUMN><COLUMN>1</COLUMN><COLUMN>2</COLUMN>
+			</RECORD>
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select max(distinct(d1+d2)),min(d1),count(d2) from t2 where exists(select c1 from t1 where c1=d1); </SQL>	
+		<RESULT>
+			<RECORD>
+				<COLUMN>4</COLUMN><COLUMN>1</COLUMN><COLUMN>2</COLUMN>
+			</RECORD>
+		</RESULT>	
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->
+		<SQL> select max(distinct(c1+c2)),count(c1) from t1 where c1&gt;(select top 1 c1 from t1); </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>4</COLUMN><COLUMN>1</COLUMN>
+			</RECORD>
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->
+		<SQL> select max(distinct(c1+c2)),min(d1) from t1 left join t2 on c1=d1,t3 where c2&gt;e2; </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>4</COLUMN><COLUMN>2</COLUMN>
+			</RECORD>
+		</RESULT>	
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点6：结束 - - - - - - - - - - - -->
+	<TestPointBegin>测试点7：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> drop table t1 cascade; </SQL>
+		<SQL> drop table t2 cascade; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t1(c1 int,c2 int,c3 int,c4 int); </SQL>
+		<SQL> create index it1c1c2 on t1(c1,c2); </SQL>
+		<SQL> create table t2(d1 int,d2 int,d3 int,d4 int); </SQL>
+		<SQL> create index it2d1d2 on t2(d1,d2); </SQL>
+	</SQL_CASE>
+	<SQL_CASE>
+		<!-- 插入数据 -->
+		<SQL> insert into t1 values(1,1,1,1); </SQL>
+		<SQL> insert into t1 values(2,2,2,2); </SQL>
+		<SQL> insert into t1 values(3,3,3,3); </SQL>
+		<SQL> insert into t1 values(4,4,4,4); </SQL>
+		
+		<SQL> insert into t2 values(1,1,1,1); </SQL>
+		<SQL> insert into t2 values(2,2,2,2); </SQL>		
+	</SQL_CASE>
+	<SQL_CASE>
+		<!-- 验证 -->
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select * from t1,t2 where c1=d1 and c2=d2 and c1=1 and c2=1; </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN>
+			</RECORD>
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select * from t1,t2 where c1=d1 and c2=d2 and c1=1 and c2&gt;1; </SQL>
+		<RESULT><!-- (插入的结果集是一个空结果集) -->
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select * from t1,t2 where c1=d1 and c2=d2 and c1=1 and c2&gt;=1; </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN>
+			</RECORD>
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select * from t1,t2 where c1=d1 and c2=d2 and c1=1 and c2&lt;1; </SQL>
+		<RESULT><!-- (插入的结果集是一个空结果集) -->
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select * from t1,t2 where c1=d1 and c2=d2 and c1=1 and c2&lt;=1; </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN>
+			</RECORD>
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select * from t1,t2 where c1=d1 and c2=d2 and c1=1 and c2&gt;1 and c2&lt;5; </SQL>
+		<RESULT><!-- (插入的结果集是一个空结果集) -->
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select * from t1,t2 where c1=d1 and c2=d2 and c1=1 and c2&gt;=1 and c2&lt;5; </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN>
+			</RECORD>
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select * from t1,t2 where c1=d1 and c2=d2 and c1=1 and c2&gt;=1 and c2&lt;=5; </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN>
+			</RECORD>
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select * from t1,t2 where c1=d1 and c2=d2 and c1=1 and c2&gt;1 and c2&lt;=5; </SQL>	
+		<RESULT><!-- (插入的结果集是一个空结果集) -->
+		</RESULT>	
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点7：结束 - - - - - - - - - - - -->
+	<TestPointBegin>测试点8：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> drop table t1 cascade; </SQL>
+		<SQL> drop table t2 cascade; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t1(c1 int,c2 int,c3 int,c4 int); </SQL>
+		<SQL> create index it1c1 on t1(c1); </SQL>
+		<SQL> create table t2(d1 int,d2 int,d3 int,d4 int); </SQL>
+		<SQL> create index it2d1 on t2(d1); </SQL>		
+	</SQL_CASE>
+	<SQL_CASE>
+		<!-- 插入数据 -->
+		<SQL> insert into t1 values(1,1,1,1); </SQL>
+		<SQL> insert into t1 values(2,2,2,2); </SQL>
+		<SQL> insert into t1 values(3,3,3,3); </SQL>
+		<SQL> insert into t1 values(4,4,4,4); </SQL>
+		
+		<SQL> insert into t2 values(1,1,1,1); </SQL>
+		<SQL> insert into t2 values(2,2,2,2); </SQL>		
+	</SQL_CASE>
+	<SQL_CASE>
+		<!-- 验证 -->
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select * from t1,t2 where c1=d1 and c1&lt;2; </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN>
+			</RECORD>
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select * from t1,t2 where c1=d1 and c1&gt;2; </SQL>
+		<RESULT><!-- (插入的结果集是一个空结果集) -->
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select * from t1,t2 where c1=d1 and c1&gt;=2; </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN>
+			</RECORD>
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select * from t1,t2 where c1=d1 and c1&lt;=2; </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN>
+			</RECORD>
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select * from t1,t2 where c1=d1 and c1&gt;2 and c1&lt;5; </SQL>
+		<RESULT><!-- (插入的结果集是一个空结果集) -->
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select * from t1,t2 where c1=d1 and c1&gt;2 and c1&lt;=5; </SQL>
+		<RESULT><!-- (插入的结果集是一个空结果集) -->
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select * from t1,t2 where c1=d1 and c1&gt;=2 and c1&lt;=5; </SQL>		
+		<RESULT>
+			<RECORD>
+				<COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN>
+			</RECORD>
+		</RESULT>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点8：结束 - - - - - - - - - - - -->
+	<TestPointBegin>测试点9：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> drop table t1 cascade; </SQL>
+		<SQL> drop table t2 cascade; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t1(c1 int cluster primary key,c2 int); </SQL>
+		<SQL> create table t2(d1 int cluster primary key,d2 int); </SQL>
+		<SQL> create or replace procedure pro1 as i int; begin for i in 1..100 loop insert into t1 values(i,i); end loop; end; </SQL>
+		<SQL> create or replace procedure pro2 as i int; begin for i in 1..100 loop insert into t2 values(i,i); end loop; end; </SQL>		
+	</SQL_CASE>
+	<SQL_CASE>
+		<!-- 插入数据 -->
+		<SQL> call pro1; </SQL>
+		<SQL> call pro2; </SQL>
+	</SQL_CASE>
+	<SQL_CASE>
+		<!-- 验证 -->
+		<SQL> select c1,d1 from t1 inner merge join t2 on c1=d1; </SQL>		
+	</SQL_CASE>	
+	<!-- - - - - - - - - - - - 测试点9：结束 - - - - - - - - - - - -->
+	<TestPointBegin>测试点10：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> drop table t1 cascade; </SQL>
+		<SQL> drop table t2 cascade; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t1(c1 int,c2 int,c3 int,c4 int); </SQL>
+		<SQL> create index it1c1c2 on t1(c1,c2); </SQL>
+		<SQL> create table t2(d1 int,d2 int,d3 int,d4 int); </SQL>
+		<SQL> create index it2d1d2 on t2(d1,d2); </SQL>		
+	</SQL_CASE>
+	<SQL_CASE>
+		<!-- 插入数据 -->
+		<SQL> insert into t1 values(1,1,1,1); </SQL>
+		<SQL> insert into t1 values(2,2,2,2); </SQL>
+		<SQL> insert into t1 values(3,3,3,3); </SQL>
+		<SQL> insert into t1 values(4,4,4,4); </SQL>
+		
+		<SQL> insert into t2 values(1,1,1,1); </SQL>
+		<SQL> insert into t2 values(2,2,2,2); </SQL>
+	</SQL_CASE>
+	<SQL_CASE>
+		<!-- 验证 -->
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select * from t1,t2 where c1=d1 and c2&gt;1; </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN>
+			</RECORD>
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select * from t1,t2 where c1=d1 and c2&gt;=1; </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN>
+			</RECORD>
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select * from t1,t2 where c1=d1 and c2&lt;1; </SQL>
+		<RESULT><!-- (插入的结果集是一个空结果集) -->
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select * from t1,t2 where c1=d1 and c2&lt;=1; </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN>
+			</RECORD>
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select * from t1,t2 where c1=d1 and c2&gt;1 and c2&lt;5; </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN>
+			</RECORD>
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->				
+		<SQL> select * from t1,t2 where c1=d1 and c2&gt;=1 and c2&lt;5; </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN>
+			</RECORD>
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select * from t1,t2 where c1=d1 and c2&gt;1 and c2&lt;=5; </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN>
+			</RECORD>
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select * from t1,t2 where c1=d1 and c2&gt;=1 and c2&lt;=5; </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN>
+			</RECORD>
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select * from t1,t2 where  c1=d2; </SQL>		
+		<RESULT>
+			<RECORD>
+				<COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN>
+			</RECORD>
+		</RESULT>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点10：结束 - - - - - - - - - - - -->
+	<TestPointBegin>测试点11：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> drop table t1 cascade; </SQL>
+		<SQL> drop table t2 cascade; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t1(c1 int,c2 int,c3 int,c4 int); </SQL>
+		<SQL> create index it1c1c2 on t1(c1,c2); </SQL>
+		<SQL> create table t2(d1 int,d2 int,d3 int,d4 int); </SQL>
+		<SQL> create index it2d1d2 on t2(d1,d2); </SQL>
+	</SQL_CASE>
+	<SQL_CASE>
+		<!-- 插入数据 -->
+		<SQL> insert into t1 values(1,1,1,1); </SQL>
+		<SQL> insert into t1 values(2,2,2,2); </SQL>
+		<SQL> insert into t1 values(3,3,3,3); </SQL>
+		<SQL> insert into t1 values(4,4,4,4); </SQL>
+		
+		<SQL> insert into t2 values(1,1,1,1); </SQL>
+		<SQL> insert into t2 values(2,2,2,2); </SQL>
+	</SQL_CASE>
+	<SQL_CASE>
+		<!-- 验证 -->
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select * from t1 where c1 in (select d1 from t2); </SQL>		
+		<RESULT>
+			<RECORD>
+				<COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN>
+			</RECORD>
+		</RESULT>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点11：结束 - - - - - - - - - - - -->
+	<TestPointBegin>测试点12：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> drop table t1 cascade; </SQL>
+		<SQL> drop table t2 cascade; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t1(c1 int cluster primary key,c2 int,c3 int,c4 int); </SQL>
+		<SQL> create table t2(d1 int,d2 int,d3 int,d4 int); </SQL>
+		<SQL> create index it2d1d2 on t2(d1,d2); </SQL>		
+	</SQL_CASE>
+	<SQL_CASE>
+		<!-- 插入数据 -->
+		<SQL> insert into t1 values(1,1,1,1); </SQL>
+		<SQL> insert into t1 values(2,2,2,2); </SQL>
+		<SQL> insert into t1 values(3,3,3,3); </SQL>
+		<SQL> insert into t1 values(4,4,4,4); </SQL>
+		
+		<SQL> insert into t2 values(1,1,1,1); </SQL>
+		<SQL> insert into t2 values(2,2,2,2); </SQL>
+	</SQL_CASE>
+	<SQL_CASE>
+		<!-- 验证 -->
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select * from t1 where c1 in (select d1 from t2); </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN>
+			</RECORD>
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select * from t1 where c1 not in (select d1 from t2) and c2&gt;2; </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>3</COLUMN><COLUMN>3</COLUMN><COLUMN>3</COLUMN><COLUMN>3</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>4</COLUMN><COLUMN>4</COLUMN><COLUMN>4</COLUMN><COLUMN>4</COLUMN>
+			</RECORD>
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select * from t1 where c3 not in (select d1 from t2) and c2&gt;2; </SQL>		
+		<RESULT>
+			<RECORD>
+				<COLUMN>3</COLUMN><COLUMN>3</COLUMN><COLUMN>3</COLUMN><COLUMN>3</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>4</COLUMN><COLUMN>4</COLUMN><COLUMN>4</COLUMN><COLUMN>4</COLUMN>
+			</RECORD>
+		</RESULT>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点12：结束 - - - - - - - - - - - -->
+	<TestPointBegin>测试点13：开始 </TestPointBegin>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> drop table t1 cascade; </SQL>
+		<SQL> drop table t2 cascade; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t1(c1 int,c2 int,c3 int,c4 int); </SQL>
+		<SQL> create index it1c1c2 on t1(c1,c2); </SQL>
+		<SQL> create index it1c3 on t1(c3); </SQL>
+		<SQL> create table t2(d1 int,d2 int,d3 int,d4 int); </SQL>
+		<SQL> create index it2d1d2 on t2(d1,d2); </SQL>		
+	</SQL_CASE>	
+	<SQL_CASE>
+		<!-- 插入数据 -->
+		<SQL> insert into t1 values(1,1,1,1); </SQL>
+		<SQL> insert into t1 values(2,2,2,2); </SQL>
+		<SQL> insert into t1 values(3,3,3,3); </SQL>
+		<SQL> insert into t1 values(4,4,4,4); </SQL>
+		
+		<SQL> insert into t2 values(1,1,1,1); </SQL>
+		<SQL> insert into t2 values(2,2,2,2); </SQL>
+	</SQL_CASE>
+	<SQL_CASE>
+		<!-- 验证 -->
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select c1,d1 from t1 inner hash join t2 on c1=d1 and c2=d2 where d1=1; </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>1</COLUMN><COLUMN>1</COLUMN>
+			</RECORD>
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select * from t1 cross join t2 index it2d1d2 where c1=1; </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN>
+			</RECORD>
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select * from t1 inner join t2 index it2d1d2 on c1=d1 and c2=d2 or c3=d3 where c1=1; </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN>
+			</RECORD>
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select * from t1,t2 where (c1=d1 and c2=d2) or (c1=d1 and c2=2 and d2=3) or c1=1; </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN>
+			</RECORD>
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select * from t1 full outer join t2 index it2d1d2 on c1=d1 and c2=d2 or c3=d3 where c1=1; </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN>
+			</RECORD>
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select 1 from t1 where exists (select * from t2 where d1=c1); </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>1</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>1</COLUMN>
+			</RECORD>
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select c1 from t1 where exists (select * from t2 where d3=c3); </SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>1</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>2</COLUMN>
+			</RECORD>
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->		
+		<SQL> select c1 from t1 where not exists (select * from t2 where d3=c3); </SQL>	
+		<RESULT>
+			<RECORD>
+				<COLUMN>3</COLUMN>
+			</RECORD>
+			<RECORD>
+				<COLUMN>4</COLUMN>
+			</RECORD>
+		</RESULT>	
+	</SQL_CASE>
+        <!-- - - - - - - - - - - - 测试点12：结束 - - - - - - - - - - - -->
+        <TestPointBegin>测试点13：开始 </TestPointBegin>
+        <SQL_CASE>
+        	<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> drop table t1 cascade; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t1(c1 int,c2 int,c3 int,c4 int); </SQL>
+		<SQL> create index it1c1 on t1(c1); </SQL>
+		<SQL> create or replace procedure pro1 as c1 cursor for select c1,c2 from t1; myc1 int; myc2 int; begin open c1; loop fetch c1 into myc1,myc2;  exit when c1%notfound; end loop; close c1; end; </SQL>
+	</SQL_CASE>
+	<SQL_CASE>
+		<!-- 插入数据 -->
+		<SQL> call pro1; </SQL>		
+	</SQL_CASE>
+	<SQL_CASE>
+		<!-- 验证 -->		
+		<BEGINTRANS> ReadUncommitted </BEGINTRANS><!-- 可以进行脏读，意思是说，不发布共享锁，也不接受独占锁-->		
+		<SQL> select absolute * from t1; </SQL>
+		<ENDTRANS> commit </ENDTRANS>
+		<BEGINTRANS> ReadCommitted </BEGINTRANS><!-- 在正在读取数据时保持共享锁，以避免脏读，但是在事务结束之前可以更改数据，从而导致不可重复的读取或幻像数据-->
+		<SQL> select * from t1 for update; </SQL>
+		<ENDTRANS> commit </ENDTRANS>	
+	</SQL_CASE>
+        <!-- - - - - - - - - - - - 测试点13：结束 - - - - - - - - - - - -->
+        <TestPointBegin>测试点14：开始 </TestPointBegin>
+        <SQL_CASE>
+        	<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> drop table t1 cascade; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t1(c1 int,c2 int,c3 int,c4 int); </SQL>
+		<SQL> create index it1c1 on t1(c1); </SQL>
+        </SQL_CASE>
+        <SQL_CASE>
+        	<!-- 插入数据 -->
+        	<SQL> insert into t1 values(1,1,1,1); </SQL>
+		<SQL> insert into t1 values(2,2,2,2); </SQL>
+		<SQL> insert into t1 values(3,3,3,3); </SQL>
+		<SQL> insert into t1 values(4,4,4,4); </SQL>
+        </SQL_CASE>
+        <SQL_CASE>
+        	<!-- 验证 1 -->
+        	<BEGINTRANS> RepeatableRead </BEGINTRANS><!-- 在查询中使用的所有数据上放置锁，以防止其他用户更新这些数据。防止不可重复的读取，但是仍可以有幻像行-->        	        	
+        	<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->        	
+        	<SQL> select absolute * from t1; </SQL>
+        	<RESULT>
+        		<RECORD>
+        			<COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN>
+        		</RECORD>
+        		<RECORD>
+        			<COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN>
+        		</RECORD>
+        		<RECORD>
+        			<COLUMN>3</COLUMN><COLUMN>3</COLUMN><COLUMN>3</COLUMN><COLUMN>3</COLUMN>
+        		</RECORD>
+        		<RECORD>
+        			<COLUMN>4</COLUMN><COLUMN>4</COLUMN><COLUMN>4</COLUMN><COLUMN>4</COLUMN>
+        		</RECORD>
+        	</RESULT>
+        	<ENDTRANS> commit </ENDTRANS>        	
+        	<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->        	
+        	<SQL> select c1 from t1 order by c1; </SQL>
+        	<RESULT>
+        		<RECORD>
+        			<COLUMN>1</COLUMN>
+        		</RECORD>
+        		<RECORD>
+        			<COLUMN>2</COLUMN>
+        		</RECORD>
+        		<RECORD>
+        			<COLUMN>3</COLUMN>
+        		</RECORD>
+        		<RECORD>
+        			<COLUMN>4</COLUMN>
+        		</RECORD>
+        	</RESULT>        	
+        	<BEGINTRANS> Serializable </BEGINTRANS><!-- 在 DataSet 上放置范围锁，以防止在事务完成之前由其他用户更新行或向数据集中插入行-->        	
+        	<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->        	
+        	<SQL> select * from t1 for update; </SQL>
+        	<RESULT>
+        		<RECORD>
+        			<COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN>
+        		</RECORD>
+        		<RECORD>
+        			<COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN>
+        		</RECORD>
+        		<RECORD>
+        			<COLUMN>3</COLUMN><COLUMN>3</COLUMN><COLUMN>3</COLUMN><COLUMN>3</COLUMN>
+        		</RECORD>
+        		<RECORD>
+        			<COLUMN>4</COLUMN><COLUMN>4</COLUMN><COLUMN>4</COLUMN><COLUMN>4</COLUMN>
+        		</RECORD>
+        	</RESULT>
+        	<ENDTRANS> commit </ENDTRANS>        	
+        	<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->        	
+        	<SQL> select c1 from t1 order by c1; </SQL>
+        	<RESULT>
+        		<RECORD>
+        			<COLUMN>1</COLUMN>
+        		</RECORD>
+        		<RECORD>
+        			<COLUMN>2</COLUMN>
+        		</RECORD>
+        		<RECORD>
+        			<COLUMN>3</COLUMN>
+        		</RECORD>
+        		<RECORD>
+        			<COLUMN>4</COLUMN>
+        		</RECORD>
+        	</RESULT>        		        	        	
+        </SQL_CASE>
+        <SQL_CASE>
+        	<!-- 验证 2 -->
+        	<NEWTRANS></NEWTRANS>
+        	<NEWTRANS></NEWTRANS>
+        	<TRANS0>
+        	   <BEGINTRANS> ReadCommitted </BEGINTRANS><!-- 在正在读取数据时保持共享锁，以避免脏读，但是在事务结束之前可以更改数据，从而导致不可重复的读取或幻像数据-->
+        	   <SQL> insert into t1 values(5,5,5,5); </SQL>
+        	</TRANS0>
+        	<SLEEP> 1000 </SLEEP>
+        	<TRANS1>
+        	   <!-- 新建连接 2 -->        	   	
+        	   <BEGINTRANS> ReadCommitted </BEGINTRANS><!-- 在正在读取数据时保持共享锁，以避免脏读，但是在事务结束之前可以更改数据，从而导致不可重复的读取或幻像数据-->
+        	            	           	           
+        	   <TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->        	   
+        	   <SQL> select absolute * from t1; </SQL>
+        	   <RESULT>
+        		<RECORD>
+        			<COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN>
+        		</RECORD>
+        		<RECORD>
+        			<COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN>
+        		</RECORD>
+        		<RECORD>
+        			<COLUMN>3</COLUMN><COLUMN>3</COLUMN><COLUMN>3</COLUMN><COLUMN>3</COLUMN>
+        		</RECORD>
+        		<RECORD>
+        			<COLUMN>4</COLUMN><COLUMN>4</COLUMN><COLUMN>4</COLUMN><COLUMN>4</COLUMN>
+        		</RECORD>
+        		<RECORD>
+        			<COLUMN>5</COLUMN><COLUMN>5</COLUMN><COLUMN>5</COLUMN><COLUMN>5</COLUMN>
+        		</RECORD>
+        	   </RESULT>
+        	</TRANS1>
+        	<SLEEP> 1000 </SLEEP>
+        	<TRANS0>     
+        	     	   
+        	   <ENDTRANS> commit </ENDTRANS>
+        	</TRANS0>
+        	<SLEEP> 1000 </SLEEP>
+        	<TRANS1>  
+        	        	   
+        	   <ENDTRANS> commit </ENDTRANS>
+        	</TRANS1>
+        </SQL_CASE>
+        <SQL_CASE>
+        	<!-- 验证 3 -->        	
+        	<TRANS0>        	   
+        	   <BEGINTRANS> ReadCommitted </BEGINTRANS><!-- 在正在读取数据时保持共享锁，以避免脏读，但是在事务结束之前可以更改数据，从而导致不可重复的读取或幻像数据-->
+        	   
+        	   <SQL> lock table t1 in exclusive mode; </SQL>
+        	</TRANS0>
+        	<SLEEP> 1000 </SLEEP>
+        	<TRANS1>        	   
+        	   <BEGINTRANS> ReadCommitted </BEGINTRANS><!-- 在正在读取数据时保持共享锁，以避免脏读，但是在事务结束之前可以更改数据，从而导致不可重复的读取或幻像数据-->
+        	   
+        	   <TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->        	   
+        	   <SQL> select * from t1 where c1=1 order by c1 for update; </SQL>
+        	</TRANS1>
+        	<SLEEP> 1000 </SLEEP>
+        	<TRANS0>     
+        	      	   
+        	   <ENDTRANS> commit </ENDTRANS>
+        	</TRANS0>
+        	<SLEEP> 1000 </SLEEP>
+        	<TRANS1>     
+        	      	  
+        	   <ENDTRANS> commit </ENDTRANS>
+        	</TRANS1>
+                                
+        </SQL_CASE>
+        <!-- - - - - - - - - - - - 测试点14：结束 - - - - - - - - - - - -->
+        <TestPointBegin>测试点15：开始 </TestPointBegin>
+        <SQL_CASE>
+        	<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> drop table t1 cascade; </SQL>
+		<SQL> drop table t2 cascade; </SQL>
+		<SQL> drop table t3 cascade; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t1(c1 int,c2 int); </SQL>
+		<SQL> create index it1_fbi on t1(c1+1); </SQL>
+		<SQL> create table t2(d1 int,d2 int); </SQL>	
+		<SQL> create table t3(e1 int,e2 varchar(50)); </SQL>
+		<SQL> create context index it3_cont on t3(e2); </SQL>			
+        </SQL_CASE>
+        <SQL_CASE>
+        	<!-- 插入数据 -->
+        	<SQL> insert into t1 values(1,1); </SQL>
+        	<SQL> insert into t1 values(2,2); </SQL>
+        	<SQL> insert into t1 values(3,3); </SQL>  
+        	
+        	<SQL> insert into t2 values(1,1); </SQL>
+        	<SQL> insert into t2 values(2,2); </SQL>
+        	<SQL> insert into t2 values(3,3); </SQL>     
+        	
+        	<SQL> insert into t3 values(1,&apos;aaaa&apos;); </SQL>
+        	<SQL> insert into t3 values(2,&apos;bbbb&apos;); </SQL>  	
+        	<SQL> alter context index it3_cont on t3 rebuild; </SQL>        	
+        </SQL_CASE>
+        <SQL_CASE>
+        	<!-- 验证 -->
+        	 
+        	<NERROR> -3204 </NERROR>
+        	<TYPE> DIRECT_EXECUTE_FAIL </TYPE><!-- 预期执行失败 -->        		
+        	<SQL> select c1 from t1 where c1&gt;1 and c1+?&lt;?; </SQL>
+        	
+        	<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->        	
+        	<SQL> select c1 from t1 where (select max(c1) from t1)&gt;c1+1; </SQL>
+        	<RESULT>
+        		<RECORD>
+        			<COLUMN>1</COLUMN>
+        		</RECORD>
+        	</RESULT>
+        	<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->        	
+        	<SQL> select * from t1,t2 where c1+1 in (1,2,3) and c1+c2 in (1,2,3); </SQL>
+        	<RESULT>
+        		<RECORD>
+        			<COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN>
+        		</RECORD>
+        		<RECORD>
+        			<COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN>
+        		</RECORD>
+        		<RECORD>
+        			<COLUMN>1</COLUMN><COLUMN>1</COLUMN><COLUMN>3</COLUMN><COLUMN>3</COLUMN>
+        		</RECORD>        
+        	</RESULT>
+        	<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->        	
+        	<SQL> select count(*) from t1,t2 where c1 in (c1,2,3); </SQL>   
+        	<RESULT>
+        		<RECORD>
+        			<COLUMN>9</COLUMN>
+        		</RECORD>
+        	</RESULT>
+        	<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->        	
+        	<SQL> select * from t3,t2 where contains(e2,&apos;aaaa&apos;); </SQL>
+        	<RESULT>
+        		<RECORD>
+        			<COLUMN>1</COLUMN><COLUMN>aaaa</COLUMN><COLUMN>1</COLUMN><COLUMN>1</COLUMN>
+        		</RECORD>
+        		<RECORD>
+        			<COLUMN>1</COLUMN><COLUMN>aaaa</COLUMN><COLUMN>2</COLUMN><COLUMN>2</COLUMN>
+        		</RECORD>
+        		<RECORD>
+        			<COLUMN>1</COLUMN><COLUMN>aaaa</COLUMN><COLUMN>3</COLUMN><COLUMN>3</COLUMN>
+        		</RECORD>
+        	</RESULT>
+        	<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->        	
+        	<SQL> select * from t3,t2 where rownum is null; </SQL>       
+        	<RESULT><!-- (插入的结果集是一个空结果集) -->
+        	</RESULT>	     	
+        </SQL_CASE>
+        <!-- - - - - - - - - - - - 测试点15：结束 - - - - - - - - - - - -->
+        <TestPointBegin>测试点16：开始 </TestPointBegin>
+        <SQL_CASE>
+        	<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> drop table t1 cascade; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t1(c1 int,c2 int); </SQL>
+		<SQL> create index it1c1 on t1(c1); </SQL>
+        </SQL_CASE>
+        <SQL_CASE>
+        	<!-- 插入数据 -->
+        	<SQL> insert into t1 values(1,1); </SQL>
+        	<SQL> insert into t1 values(2,2); </SQL>
+        	<SQL> insert into t1 values(3,3); </SQL>
+        	<SQL> insert into t1 values(4,4); </SQL>        	
+        </SQL_CASE>
+        <SQL_CASE>
+        	<!-- 验证 -->
+        	<SQL> select set_table_option(&apos;t1&apos;,&apos;disallowpagelocks&apos;,1); </SQL>
+        	<SQL> select set_table_option(&apos;t1&apos;,&apos;disallowrowlocks&apos;,1); </SQL>
+        	<SQL> select * from t1 where c1&gt;1; </SQL>
+        	<SQL> update t1 set c2=0 where c1=1; </SQL>        	
+        </SQL_CASE>        
+        <!-- - - - - - - - - - - - 测试点16：结束 - - - - - - - - - - - -->
+        <TestPointBegin>测试点17：开始 </TestPointBegin>
+        <SQL_CASE>
+        	<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->
+		<SQL> drop table t1 cascade; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> create table t1(c1 int,c2 int); </SQL>
+		<SQL> create index it1c1 on t1(c1); </SQL>		
+        </SQL_CASE>
+        <SQL_CASE>
+        	<!-- 插入数据 -->
+        	<SQL> insert into t1 values(1,1); </SQL>
+        	<SQL> insert into t1 values(2,2); </SQL>
+        	<SQL> insert into t1 values(3,3); </SQL>
+        	<SQL> insert into t1 values(4,4); </SQL>        	
+        </SQL_CASE>
+        <SQL_CASE>
+        	<!-- 验证1 -->        	
+        	<BEGINTRANS> Serializable </BEGINTRANS><!-- 在 DataSet 上放置范围锁，以防止在事务完成之前由其他用户更新行或向数据集中插入行-->  
+        	   <TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->        	      	
+        	   <SQL> select c1 from t1 where c1 in (1,2); </SQL>
+        	   <RESULT>
+        		<RECORD>
+        			<COLUMN>1</COLUMN>
+        		</RECORD>
+        		<RECORD>
+        			<COLUMN>2</COLUMN>
+        		</RECORD>
+        	   </RESULT>
+        	<ENDTRANS> commit </ENDTRANS>
+        	<BEGINTRANS> ReadCommitted </BEGINTRANS><!-- 在正在读取数据时保持共享锁，以避免脏读，但是在事务结束之前可以更改数据，从而导致不可重复的读取或幻像数据-->
+        	<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->        	
+        	<SQL> select * from t1; </SQL>
+        	<RESULT>
+        		<RECORD>
+        			<COLUMN>1</COLUMN><COLUMN>1</COLUMN>
+        		</RECORD>
+        		<RECORD>
+        			<COLUMN>2</COLUMN><COLUMN>2</COLUMN>
+        		</RECORD>
+        		<RECORD>
+        			<COLUMN>3</COLUMN><COLUMN>3</COLUMN>
+        		</RECORD>
+        		<RECORD>
+        			<COLUMN>4</COLUMN><COLUMN>4</COLUMN>
+        		</RECORD>
+        	</RESULT>    
+        	<ENDTRANS> commit </ENDTRANS>         	
+        	        	   	
+        	<SMES>设置dm.ini，参数 ENABLE_MVCC = 1 ，请稍等片刻！; </SMES>     	
+        	
+        	<SQL_CASE>
+        		<!-- 测试设置dmini -->
+		        <SQLSTR></SQLSTR>		        				
+		        <!-- 先获取该参数，判断是否需要重新设置 -->
+		        <GETDMINI>
+		           <INIPATH> @SERVERPATH\dm.ini </INIPATH><!-- ini文件在服务器的目录下面 -->
+		           <VALNAME> ENABLE_MVCC </VALNAME>
+		           <VAL> @SQLSTR </VAL>		
+	                </GETDMINI>
+	                <IF>@SQLSTR=1</IF>
+	                   <SMES> 无需设置！ </SMES>
+	                <ELSE><!-- 需要设置 -->
+	                   <SERVERCMD> EXIT </SERVERCMD>
+	                   <SLEEP> 5000 </SLEEP>
+	                   <SETDMINI>		
+		              <INIPATH> @SERVERPATH\dm.ini </INIPATH>
+		              <VALNAME> ENABLE_MVCC </VALNAME>
+		              <VAL> 1 </VAL>		
+		           </SETDMINI>		
+		           <RUNSERVER>dm.ini</RUNSERVER>		           
+		           <!-- 判断是否设置成功 -->
+		           <GETDMINI>
+		              <INIPATH> @SERVERPATH\dm.ini </INIPATH><!-- ini文件在服务器的目录下面 -->
+		              <VALNAME> ENABLE_MVCC </VALNAME>
+		              <VAL> @SQLSTR1 </VAL>		
+	                   </GETDMINI>
+	                   <IF>@SQLSTR1=1</IF>
+	                      <SMES> 设置成功！ </SMES>
+	                   <ELSE>
+	                      <SMES> 设置失败！ </SMES>
+	                   </ELSE>
+	               </ELSE>	                 	               	               
+        	</SQL_CASE>  
+        	
+        	<NEWTRANS></NEWTRANS>
+        	<NEWTRANS></NEWTRANS>  
+        	     	       	
+        	<TRANS2>        	
+        	   <BEGINTRANS> ReadCommitted </BEGINTRANS><!-- 在正在读取数据时保持共享锁，以避免脏读，但是在事务结束之前可以更改数据，从而导致不可重复的读取或幻像数据-->
+        	   <SQL> insert into t1 values(5,5); </SQL>
+        	</TRANS2>
+        	<SLEEP> 1000 </SLEEP>
+        	<TRANS3>
+        	   <BEGINTRANS> ReadCommitted </BEGINTRANS><!-- 在正在读取数据时保持共享锁，以避免脏读，但是在事务结束之前可以更改数据，从而导致不可重复的读取或幻像数据-->
+        	     
+        	   <TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->        	         	        	
+                   <SQL> select * from t1; </SQL>
+                   <RESULT>
+                   	<RECORD>
+                   		<COLUMN>1</COLUMN><COLUMN>1</COLUMN>
+                   	</RECORD>
+                   	<RECORD>
+                   		<COLUMN>2</COLUMN><COLUMN>2</COLUMN>
+                   	</RECORD>
+                   	<RECORD>
+                   		<COLUMN>3</COLUMN><COLUMN>3</COLUMN>
+                   	</RECORD>
+                   	<RECORD>
+                   		<COLUMN>4</COLUMN><COLUMN>4</COLUMN>
+                   	</RECORD>
+                   </RESULT>
+        	   <SQL> select * from t1 order by c1 desc; </SQL>
+        	   <RESULT>
+        	   	<RECORD>
+        	   		<COLUMN>4</COLUMN><COLUMN>4</COLUMN>
+        	   	</RECORD>
+        	   	<RECORD>
+        	   		<COLUMN>3</COLUMN><COLUMN>3</COLUMN>
+        	   	</RECORD>
+        	   	<RECORD>
+        	   		<COLUMN>2</COLUMN><COLUMN>2</COLUMN>
+        	   	</RECORD>
+        	   	<RECORD>
+        	   		<COLUMN>1</COLUMN><COLUMN>1</COLUMN>
+        	   	</RECORD>
+        	   </RESULT>
+        	   <SQL> select * from t1 where c1&gt;1; </SQL>
+        	   <RESULT>
+        	   	<RECORD>
+        	   		<COLUMN>2</COLUMN><COLUMN>2</COLUMN>
+        	   	</RECORD>
+        	   	<RECORD>
+        	   		<COLUMN>3</COLUMN><COLUMN>3</COLUMN>
+        	   	</RECORD>
+        	   	<RECORD>
+        	   		<COLUMN>4</COLUMN><COLUMN>4</COLUMN>
+        	   	</RECORD>
+        	   </RESULT>
+        	</TRANS3>
+        	<SLEEP> 1000 </SLEEP>
+        	<TRANS2>        	    
+        	    <TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->        	    
+        	    <SQL> select * from t1 where c1&gt;2 for update; </SQL>
+        	    <RESULT>
+        	    	<RECORD>
+        	    		<COLUMN>3</COLUMN><COLUMN>3</COLUMN>
+        	    	</RECORD>
+        	    	<RECORD>
+        	    		<COLUMN>4</COLUMN><COLUMN>4</COLUMN>
+        	    	</RECORD>
+        	    	<RECORD>
+        	    		<COLUMN>5</COLUMN><COLUMN>5</COLUMN>
+        	    	</RECORD>
+        	    </RESULT>
+        	</TRANS2>
+        	<SLEEP> 1000 </SLEEP>
+        	<TRANS3> 
+        	           	
+        	    <ENDTRANS> commit </ENDTRANS>
+        	</TRANS3>
+        	<SLEEP> 1000 </SLEEP>
+        	<TRANS2>
+        	    
+        	    <ENDTRANS> commit </ENDTRANS>
+        	</TRANS2>        	  	
+        </SQL_CASE>
+        <SQL_CASE>
+        	<!-- 验证2 -->        	
+        	
+        	<TRANS2>
+        	    <BEGINTRANS> ReadCommitted </BEGINTRANS><!-- 在正在读取数据时保持共享锁，以避免脏读，但是在事务结束之前可以更改数据，从而导致不可重复的读取或幻像数据-->
+        	    <TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->        	    
+        	    <SQL> update t1 set c1=0 where c1=1; </SQL>
+        	</TRANS2>
+        	<SLEEP> 1000 </SLEEP>
+        	<TRANS3>
+        	    <BEGINTRANS> ReadCommitted </BEGINTRANS><!-- 在正在读取数据时保持共享锁，以避免脏读，但是在事务结束之前可以更改数据，从而导致不可重复的读取或幻像数据-->
+        	    
+        	    <TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->        	          	
+        	    <SQL> select * from t1; </SQL>
+        	    <RESULT>
+        	    	<RECORD>
+        	    		<COLUMN>1</COLUMN><COLUMN>1</COLUMN>
+        	    	</RECORD>
+        	    	<RECORD>
+        	    		<COLUMN>2</COLUMN><COLUMN>2</COLUMN>
+        	    	</RECORD>
+        	    	<RECORD>
+        	    		<COLUMN>3</COLUMN><COLUMN>3</COLUMN>
+        	    	</RECORD>
+        	    	<RECORD>
+        	    		<COLUMN>4</COLUMN><COLUMN>4</COLUMN>
+        	    	</RECORD>
+        	    	<RECORD>
+        	    		<COLUMN>5</COLUMN><COLUMN>5</COLUMN>
+        	    	</RECORD>
+        	    </RESULT>
+        	</TRANS3>
+        	<SLEEP> 1000 </SLEEP>
+        	<TRANS2>
+        	   
+        	    <ENDTRANS> commit </ENDTRANS>
+        	</TRANS2>
+        	<SLEEP> 1000 </SLEEP>
+        	<TRANS3>
+        	    
+        	    <ENDTRANS> commit </ENDTRANS>
+        	</TRANS3>
+        </SQL_CASE>
+        <SQL_CASE>
+        	<!-- 验证3 -->        		
+        	
+        	<TRANS2>        	
+        	    <BEGINTRANS> Serializable </BEGINTRANS><!-- 在 DataSet 上放置范围锁，以防止在事务完成之前由其他用户更新行或向数据集中插入行-->
+        	    <SQL> insert into t1 values(7,7); </SQL>
+        	</TRANS2>
+        	<SLEEP> 1000 </SLEEP>
+        	<TRANS3>        	
+        	    <BEGINTRANS> Serializable </BEGINTRANS><!-- 在 DataSet 上放置范围锁，以防止在事务完成之前由其他用户更新行或向数据集中插入行-->
+        	   
+        	    <TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->        	    
+        	    <SQL> select * from t1; </SQL>
+        	    <RESULT>
+        	    	<RECORD>
+        	    		<COLUMN>0</COLUMN><COLUMN>1</COLUMN>
+        	    	</RECORD>
+        	    	<RECORD>
+        	    		<COLUMN>2</COLUMN><COLUMN>2</COLUMN>
+        	    	</RECORD>
+        	    	<RECORD>
+        	    		<COLUMN>3</COLUMN><COLUMN>3</COLUMN>
+        	    	</RECORD>
+        	    	<RECORD>
+        	    		<COLUMN>4</COLUMN><COLUMN>4</COLUMN>
+        	    	</RECORD>
+        	    	<RECORD>
+        	    		<COLUMN>5</COLUMN><COLUMN>5</COLUMN>
+        	    	</RECORD>
+        	    	<RECORD>
+        	    		<COLUMN>7</COLUMN><COLUMN>7</COLUMN>
+        	    	</RECORD>        	    	
+        	    </RESULT>
+        	</TRANS3>
+        	<SLEEP> 1000 </SLEEP>
+        	<TRANS2>
+        	   
+        	    <ENDTRANS> commit </ENDTRANS>
+        	</TRANS2>
+        	<SLEEP> 1000 </SLEEP>
+        	<TRANS3>
+        	    
+        	    <ENDTRANS> commit </ENDTRANS>
+        	</TRANS3>
+        </SQL_CASE>
+        <SQL_CASE>
+        	<!-- 验证4 -->
+        	
+        	<TRANS2>
+        	     <BEGINTRANS> ReadCommitted </BEGINTRANS><!-- 在正在读取数据时保持共享锁，以避免脏读，但是在事务结束之前可以更改数据，从而导致不可重复的读取或幻像数据-->
+        	     <TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->        	     
+        	     <SQL> update t1 set c1=c1+1 where c1=3; </SQL>
+        	</TRANS2>
+        	<SLEEP> 1000 </SLEEP>
+        	<TRANS3>
+        	     <BEGINTRANS> ReadCommitted </BEGINTRANS><!-- 在正在读取数据时保持共享锁，以避免脏读，但是在事务结束之前可以更改数据，从而导致不可重复的读取或幻像数据-->
+        	     
+        	     <TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL </TYPE><!-- 预期执行成功，并返回一个结果集，验证全字匹配长度 -->        	     
+        	     <SQL> select * from t1 where c1=3; </SQL>
+        	     <RESULT>
+        	     	<RECORD>
+        	     		<COLUMN>3</COLUMN><COLUMN>3</COLUMN>
+        	     	</RECORD>
+        	     </RESULT>
+        	</TRANS3>
+        	<SLEEP> 1000 </SLEEP>
+        	<TRANS2>
+        	    
+        	     <ENDTRANS> commit </ENDTRANS>
+        	</TRANS2>
+        	<SLEEP> 1000 </SLEEP>
+        	<TRANS3>
+        	    
+        	     <ENDTRANS> commit </ENDTRANS>
+        	</TRANS3>    
+        	   	
+        </SQL_CASE>
+        <!-- - - - - - - - - - - - 测试点17：结束 - - - - - - - - - - - -->
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			<SQL> drop table t1 cascade; </SQL>
+			<SQL> drop table t2 cascade; </SQL>	
+			<SQL> drop table t3 cascade; </SQL>		
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

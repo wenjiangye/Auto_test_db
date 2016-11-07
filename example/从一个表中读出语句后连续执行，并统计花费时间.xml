@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+																	
+-->
+<!--
+	测试点列表
+	1.		
+-->
+<SQLTEST>
+	<CONTENT> 从一个表中读出语句后连续执行，并统计花费时间 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<!-- +++++++++++++++++++++ 测试点1：开始 +++++++++++++++++++++ -->
+	<ROWNUM>1000</ROWNUM><!-- 申请一个变量，指定好行的数量 -->
+	<SQL_CASE><!-- 使用LOOP获取 -->
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE><!-- 不关心语句执行的结果 -->		
+		<SQL> DROP TABLE "hhm-dm"; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->		
+		<SQL> CREATE TABLE "hhm-dm"("DESCRIBE" VARCHAR(2048))</SQL>
+		<LOOP>
+			<TIMES>@ROWNUM</TIMES>
+			<NOSHOW></NOSHOW>
+			<SQL> INSERT INTO "hhm-dm" VALUES('SELECT 1'); </SQL>
+		</LOOP>
+		<SETCONNECTID> 0 </SETCONNECTID>
+		<SQL> SELECT "DESCRIBE" AS A FROM "hhm-dm"; </SQL>
+		<TIMETICKS>TIME1</TIMETICKS>
+		<SQL_CASE>
+		<OPEN><!-- 打开结果集 -->
+			<LOOP>
+				<FETCHNEXT></FETCHNEXT><!-- 把结果集游标设置到下一行 -->
+				<IF>BOOL:@FETCHNEXT=0</IF><!--@FETCHNEXT表示上一次设置游标到下一行是否成功， 如果成功，@FETCHNEXT的值为游标所在的行数，不成功则为0 -->				
+				<BREAK>  </BREAK>
+				<ELSE>					
+					<SETCONNECTID> 1 <NOSHOW></NOSHOW> </SETCONNECTID>
+					<SQL>@A</SQL>
+					<SETCONNECTID> 0 <NOSHOW></NOSHOW></SETCONNECTID>
+				</ELSE>
+			</LOOP>
+		</OPEN>
+		</SQL_CASE>	
+	
+		<TIMETICKS>TIME2</TIMETICKS>
+		<SQLSTR><EXP>(@TIME2-@TIME1)/10000000.0</EXP></SQLSTR>
+		<SMES>(@TIME2-@TIME1)/总共花费了@SQLSTR秒</SMES>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

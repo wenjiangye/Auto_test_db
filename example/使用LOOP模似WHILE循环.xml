@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1								孙峰		2008-4-2						
+-->
+<!--
+	测试点列表
+	1.		
+-->
+<SQLTEST>
+	<CONTENT> 使用LOOP模似WHILE循环 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<!-- +++++++++++++++++++++ 测试点1：开始 +++++++++++++++++++++ -->
+	<SQL_CASE>
+		<I>0</I><!-- 定义一个替代符I，并初始化为0 -->
+		<LOOP><!-- 不指定TIMES属性，LOOP相当于一个无限循环 -->
+			<IF>BOOL:@I&gt;=100</IF><!-- 判断@I是否大于等100,如果是，则跳出LOOP，否则继 -->
+			<BREAK>  </BREAK>
+			<ELSE>
+				<SQL_CASE>
+					<SQLSTR>@I </SQLSTR><!-- 如果条件不成立，则把@I追加到@SQLSTR中 -->
+				</SQL_CASE>
+			</ELSE>
+			<I><EXP>@I+1</EXP></I><!-- @I在这里进行一次+1操作 -->
+		</LOOP>		
+	</SQL_CASE>
+	<SMES>@SQLSTR</SMES><!-- 显示生成@SQLSTR的值 -->
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

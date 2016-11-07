@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1								孙峰		2007-9-5						
+-->
+<!--
+	测试点列表
+	1.循环追加	
+-->
+<SQLTEST>
+	<CONTENT> 示范使用@SQLSTR, @SQLSTR1, @SQLSTR2 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<!-- +++++++++++++++++++++ 测试点1：开始 +++++++++++++++++++++ -->
+	<SQL_CASE>
+		<SQLSTR></SQLSTR><!-- 先清空@SQLSTR变量 -->
+		<LOOP>
+			<TIMES>100</TIMES>
+			<SQLSTR>@TIMES</SQLSTR>
+		</LOOP>
+		<SQL>SELECT '@SQLSTR'</SQL><!-- 可以查看到@SQLSTR的值是循环次数的累加 -->
+	</SQL_CASE>
+	
+	<SQL_CASE>
+		<SQLSTR></SQLSTR><!-- 每次重新生成时，要清空@SQLSTR变量 -->
+		<SQL> CREATE OR REPLACE PROCEDURE P1 AS BEGIN SELECT &apos;这是一个存贮过程生成的语句&apos;;END; </SQL>
+		<SQLSTR>FromSql:P1</SQLSTR>
+		<SQL>SELECT '@SQLSTR' </SQL>		
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

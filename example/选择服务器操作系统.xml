@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+																	
+-->
+<!--
+	测试点列表
+	1.		
+-->
+<SQLTEST>
+	<CONTENT>  </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<!-- +++++++++++++++++++++ 测试点1：开始 +++++++++++++++++++++ -->
+	<SQL_CASE>
+		<WINDOWS> <!-- 如果测例执行工具选择测试服务器环境为windows，则本节点被执行 ，如果选择linux，则本节点不执行 -->
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> CREATE TABLE WIN(C INT); </SQL>
+		</WINDOWS>
+		
+		<LINUX> <!-- 如果测例执行工具选择测试服务器环境为LINUX，则本节点被执行 ，如果选择WINDOWS，则本节点不执行 -->
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE><!-- 预期执行成功 -->
+		<SQL> CREATE TABLE LINUX(C INT); </SQL>
+		</LINUX>
+		
+		<WINDOWS> <!-- 如果测例执行工具选择测试服务器环境为windows，则WINDOWS1，WINDOWS2表将被创建，如果选择linux，则任何表都不会被创建  -->
+		<SQL> CREATE TABLE WINDOWS1(C INT); </SQL>
+			<LINUX>
+			<SQL> CREATE TABLE LINUX1(C INT); </SQL>
+			</LINUX>
+		<SQL> CREATE TABLE WINDOWS2(C INT); </SQL>
+		</WINDOWS>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+		<WINDOWS> <!-- 在CLEAR标签中，WINDOWS,LINUX标签仍然有效 -->
+		<SQL> DROP TABLE WIN; </SQL>
+		</WINDOWS>
+		
+		<LINUX>
+		<SQL> DROP TABLE LINUX; </SQL>
+		</LINUX>
+		<SQL> DROP TABLE WINDOWS1; </SQL>
+		<SQL> DROP TABLE WINDOWS2; </SQL>
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

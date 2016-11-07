@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1		编写			创建			孙峰		2008-3-17						
+-->
+<!--
+	测试点列表
+	1.		
+-->
+<SQLTEST>
+	<CONTENT> 示范RECODENUMS,COLUMNNUMS,STARTTIMES的使用 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<!-- +++++++++++++++++++++ 测试点1：开始 +++++++++++++++++++++ -->
+	<SQLSTR></SQLSTR>
+	<SQLSTR2></SQLSTR2>
+	<SQLSTR2>100</SQLSTR2>
+	<SQL_CASE><!-- COLUMNNUMS的使用 -->
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE>
+		<SQL> DROP TABLE T1 CASCADE; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE>		
+		<SQLSTR>CREATE TABLE T1(C1 INT</SQLSTR>
+		<LOOP>
+			<TIMES>@SQLSTR2</TIMES>
+			<STARTTIMES>2</STARTTIMES>
+			<SQLSTR>,C@TIMES INT</SQLSTR>
+		</LOOP>
+		<SQLSTR>)</SQLSTR>
+		<SQL> @SQLSTR </SQL><!-- 建表 -->
+		<!-- 插入一行 -->
+		<SQLSTR></SQLSTR>
+		<SQLSTR>INSERT INTO T1 VALUES(1</SQLSTR>
+		<LOOP>
+			<TIMES>@SQLSTR2</TIMES>
+			<STARTTIMES>2</STARTTIMES>
+			<SQLSTR>,@TIMES</SQLSTR>
+		</LOOP>
+		<SQLSTR>)</SQLSTR>
+		<SQL> @SQLSTR </SQL><!-- 插入一行 -->
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE>
+		<SQL> SELECT * FROM T1 </SQL><!-- 示范COLUMNNUMS的使用 -->
+		<RESULT>
+			<RECORD>
+				<COLUMNNUMS>@SQLSTR2</COLUMNNUMS><!-- 在这里，指定了列数 -->
+				<COLUMN>@COLUMNNUMS</COLUMN><!-- 每一例的值为列号，列号是从一开始计数的 -->
+			</RECORD>
+		</RESULT>
+		<TYPE> DIRECT_EXECUTE_SELECT_WITH_RESULT </TYPE><!-- 预期执行成功，并返回一个结果集，但不对它验证，只验证其返回的列名 -->
+		<SQL> SELECT * FROM T1 </SQL><!-- 用来验证其列名，示范COLUMNNUMS的使用 -->
+		<RESULT>
+			<RECORD>
+				<COLUMNNUMS>@SQLSTR2</COLUMNNUMS><!-- 在这里，指定了列数 -->
+				<COLUMN>C@COLUMNNUMS</COLUMN><!-- 每一例的值为列号，列号是从一开始计数的 -->
+			</RECORD>
+		</RESULT>		
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+	<!-- +++++++++++++++++++++ 测试点1：开始 +++++++++++++++++++++ -->
+	<SQL_CASE><!-- RECODENUMS的使用 -->
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE>
+		<SQL> DROP TABLE T1 CASCADE; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE>
+		<SQL> CREATE TABLE T1(C INT); </SQL>
+		<LOOP>
+			<TIMES>@SQLSTR2</TIMES>
+			<SQL>INSERT INTO T1 VALUES(@TIMES)</SQL>
+		</LOOP>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE><!-- 预期执行成功，并返回一个结果集，只验证给定值的长度 -->
+		<SQL> SELECT * FROM T1; </SQL>
+		<RESULT>
+			<RECORDNUMS>@SQLSTR2</RECORDNUMS>
+			<RECORD>
+				<COLUMN>@RECORDNUMS</COLUMN>
+			</RECORD>
+		</RESULT>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+	<!-- +++++++++++++++++++++ 测试点1：开始 +++++++++++++++++++++ -->
+	<SQL_CASE><!-- RECODENUMS, COLUMNNUMS组合使用-->
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE>
+		<SQL> DROP TABLE T1 CASCADE; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE>
+		<SQLSTR></SQLSTR>
+		<SQLSTR>CREATE TABLE T1(C1 INT</SQLSTR>
+		<LOOP>
+			<TIMES>@SQLSTR2</TIMES>
+			<STARTTIMES>2</STARTTIMES>
+			<SQLSTR>,C@TIMES INT</SQLSTR>
+		</LOOP>
+		<SQLSTR>)</SQLSTR>
+		<SQL> @SQLSTR </SQL><!-- 建表 -->
+		<LOOP>
+			<TIMES>@SQLSTR2</TIMES>
+			<STARTTIMES>1</STARTTIMES><!-- 如果使用两个LOOP，如果子层中使用到STARTTIMES关键字，那么父层一定要指定STARTTIMES关键字 -->
+			<SQLSTR></SQLSTR>
+			<SQLSTR>INSERT INTO T1 VALUES(@TIMES1</SQLSTR><!-- 这是第一列的数据一定要自己事先填好，@TIMES1代表的是，第一行第一列 -->
+			<LOOP>
+				<TIMES>@SQLSTR2</TIMES>
+				<STARTTIMES>2</STARTTIMES>
+				<SQLSTR>,@_TIMES@TIMES</SQLSTR>
+			</LOOP>
+			<SQLSTR>)</SQLSTR>
+			<SQL> @SQLSTR </SQL><!-- 插入行-->
+		</LOOP>
+		<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE><!-- 预期执行成功，并返回一个结果集，只验证给定值的长度 -->		
+		<SQL> SELECT * FROM T1 </SQL><!-- 用来验证其列名，示范COLUMNNUMS的使用 -->
+		<RESULT>
+			<RECORDNUMS>@SQLSTR2</RECORDNUMS>
+			<RECORD>
+				<COLUMNNUMS>@SQLSTR2</COLUMNNUMS><!-- 在这里，指定了列数 -->
+				<COLUMN>@RECORDNUMS@COLUMNNUMS</COLUMN><!-- 每一例的值为列号，列号是从一开始计数的 -->
+			</RECORD>
+		</RESULT>
+	</SQL_CASE>
+	<!-- +++++++++++++++++++++ 测试点1：开始 +++++++++++++++++++++ -->	
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

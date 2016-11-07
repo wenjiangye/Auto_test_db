@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<SQLTEST>
+	<CONTENT> 该测试用例用来描述如何使用NEWCONNECTEXECUTE关键字进行操作 </CONTENT>
+	<SQL_CASE>
+		<!-- 登录名 -->
+		<UID>SYSDBA</UID><!-- 可以不指定，用工具默认的 -->
+		<!-- 登录口令 -->
+		<PWD>SYSDBA</PWD><!-- 可以不指定，用工具默认的 -->
+		<!-- 初始化库名 -->
+		<DATABASE>SYSTEM</DATABASE><!-- 可以不指定，用工具默认的 -->
+		<!-- 连接，这里，程序会把这个连接的信息保存起来，如果要重连该连接的话，只要把当前连接设置为该连接，直接用RECONNECT关键字执行就可以了 -->
+		<CONNECT></CONNECT>
+	</SQL_CASE>
+	<SQL_CASE>
+		<!-- 做某些操作，比如建个库，新建个用户，给某个用户更加了权限等 -->
+	</SQL_CASE>
+	<SQL_CASE>
+		<NEWCONNECTEXECUTE><!-- 新建一个连接，用该结果提供的连接串连接服务器，并且保持当前连接不断开 -->
+			<UID>SYSDBA</UID><!-- 登录ID -->
+			<PWD>SYSDBA</PWD><!-- 登录口令 -->
+			<DATABASE>SYSTEM</DATABASE><!-- 初始化库 -->
+			<CONNECT></CONNECT><!-- 连接,可以省略不写 -->
+			<SQL_CASE>
+				<SQL>CREATE TABLE T00001_1(C1 INT,C2 CHAR(10));</SQL>
+				<SQL>INSERT INTO T00001_1 VALUES(1,'ABC');</SQL>
+				<SQL>INSERT INTO T00001_1 VALUES(2,'DEF');</SQL>
+			</SQL_CASE>
+			<DISCONNECT></DISCONNECT><!-- 断开连接，这个可以不写，执行结束后程序会自动断开 -->
+		</NEWCONNECTEXECUTE><!-- 在这个节点中的连接，出了这个节点以后，就会自动断开连接，不管你有没有要求它断开 -->
+	</SQL_CASE>
+	<CLEAR>
+		<SQL_CASE>
+			<SQL>DROP TABLE T00001_1;</SQL>
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST>

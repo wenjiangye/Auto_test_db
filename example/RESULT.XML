@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<SQLTEST>
+	<CONTENT> 该测试用例用来描述如何编写比较结果集的测试用例 </CONTENT>
+	<CONNECT> 0 </CONNECT>	
+	<SQL_CASE>
+		<SQL>CREATE TABLE T00001_1(C1 INT,C2 CHAR(10));</SQL>
+		<SQL>INSERT INTO T00001_1 VALUES(1,'ABC');</SQL>
+		<SQL>INSERT INTO T00001_1 VALUES(2,'DEF');</SQL>
+	</SQL_CASE>
+	<SQL_CASE>
+		<TYPE>DIRECT_EXECUTE_SELECT_WITH_RESULT</TYPE><!-- 预期执行结果：返回一个结果集，但是不对检察结果集内容，只检查各个列的列名 -->
+		<SQL>SELECT * FROM T00001_1;</SQL>
+		<RESULT>
+			<RECORD>
+				<COLUMN>C1</COLUMN><COLUMN>C2</COLUMN>
+			</RECORD>
+		</RESULT>
+	</SQL_CASE>
+	<SQL_CASE>
+		<TYPE>DIRECT_EXECUTE_SELECT_COMPARE_RESULT</TYPE><!-- 预期执行结果：返回一个结果集，并检察返回的结果集，不完整比较，只比较脚本中给出的长度 -->
+		<SQL>SELECT * FROM T00001_1;</SQL>
+		<RESULT><!-- 预期语句执行后返回结果集部分，该关键字用来标识结果集开始 -->
+			<RECORD><!-- 该关键字用来标识结果集的每一行 -->
+				<COLUMN>1</COLUMN><!-- 该差键字用来标识结果集每一行的每一列 -->
+				<COLUMN>ABC</COLUMN><!-- 给出要比较的列，如果第二列不想被用来比较，那么该列可以不给出，如果不给出第二列，那么，后面的第三第四列就不能给出。注：至少有一行应该给出结果集的在该行上的全部列值 -->
+			</RECORD>
+			<RECORD>
+				<COLUMN>2</COLUMN>				
+			</RECORD>
+		</RESULT>
+	</SQL_CASE>
+	<SQL_CASE>
+		<TYPE>DIRECT_EXECUTE_SELECT_COMPARE_RESULT_FULL</TYPE><!-- 预期执行结果：返回一个结果集，并检察返回的结果集，完整比较 -->
+		<SQL>SELECT * FROM T00001_1;</SQL>
+		<RESULT><!-- 预期语句执行后返回结果集部分，该关键字用来标识结果集开始 -->
+			<RECORD><!-- 该关键字用来标识结果集的每一行 -->
+				<COLUMN>1</COLUMN><!-- 该差键字用来标识结果集每一行的每一列 -->
+				<COLUMN>ABC       </COLUMN><!-- 应该给出全部列值，包括CHAR类型应该返回的空格，呵呵 -->
+			</RECORD>
+			<RECORD>
+				<COLUMN>2</COLUMN>
+				<COLUMN>DEF       </COLUMN>				
+			</RECORD>
+		</RESULT>
+	</SQL_CASE>
+	<CLEAR>
+		<SQL_CASE>
+			<SQL>DROP TABLE T00001_1;</SQL>
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST>

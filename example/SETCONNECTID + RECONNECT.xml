@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<SQLTEST>
+	<SQL_CASE>
+		<!-- 用例描述 -->
+		<CONTENT> 该测试用例用来描述如何使用CONNECT关键字进行多个连接操作的 </CONTENT>
+	</SQL_CASE>
+	<SQL_CASE><!-- 第一个连接 -->
+		<!-- 登录名 -->
+		<UID>SYSDBA</UID><!-- 可以不指定，用工具默认的 -->
+		<!-- 登录口令 -->
+		<PWD>SYSDBA</PWD><!-- 可以不指定，用工具默认的 -->
+		<!-- 初始化库名 -->
+		<DATABASE>SYSTEM</DATABASE><!-- 可以不指定，用工具默认的 -->
+		<!-- 连接，这里，程序会把这个连接的信息保存起来，如果要重连该连接的话，只要把当前连接设置为该连接，直接用RECONNECT关键字执行就可以了 -->
+		<CONNECT>0</CONNECT><!-- 注意，关键字中间有个0，表示这是第一个连接 -->
+	</SQL_CASE>
+	<SQL_CASE>		
+		<!-- 这里面做的事情，是用第一个连接做的 -->
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE>
+		<SQL> DROP TABLE T1 CASCADE; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE>
+		<SQL>CREATE TABLE T1(C INT)</SQL>			
+	</SQL_CASE>
+	
+	<SQL_CASE><!-- 第二个连接 -->
+		<!-- 登录名 -->
+		<UID>SYSDBA</UID><!-- 如果上面一个连接创建了新的用户，这里可以填新的用户的名字 -->
+		<!-- 登录口令 -->
+		<PWD>SYSDBA</PWD><!-- 如果上面一个连接创建了新的口令，这里可以填新的库的口令 -->
+		<!-- 初始化库名 -->
+		<DATABASE>SYSTEM</DATABASE><!-- 如果上面一个连接创建了新的库，这里可以填新的库的名字 -->
+		<!-- 连接 -->
+		<CONNECT>1</CONNECT><!-- 注意，关键字中间有个1，表示这是第二个连接 -->
+	</SQL_CASE>
+	
+	<SQL_CASE>
+		<!-- 这里面做的事情，是用第二个连接做的 -->
+		<!-- 要执行的SQL语句 -->
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE>
+		<SQL> DROP TABLE T2 CASCADE; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE>
+		<SQL>CREATE TABLE T2(C INT)</SQL>		
+	</SQL_CASE>	
+	<SETCONNECTID>0</SETCONNECTID><!-- 重新把当前的连接设置为第一个连接 -->
+	<SQL_CASE>		
+		<!-- 用第一个连接再做一些操作 -->
+		<SQL>DROP TABLE T1</SQL>
+	</SQL_CASE>
+	
+	<!-- 重新把当前的连接设置为第二个连接 -->
+	<SETCONNECTID>1</SETCONNECTID>
+	<SQL_CASE>
+		<!-- 提供新的连接信息进行重连第二个连接 -->
+		<UID> SYSDBA </UID>
+		<PWD> SYSDBA </PWD>
+		<DATABASE> SYSTEM </DATABASE>
+		<RECONNECT> </RECONNECT>	
+	</SQL_CASE>
+	<SQL_CASE>		
+		<!-- 用第二个连接再做一些操作 -->
+		<SQL>DROP TABLE T2</SQL>
+	</SQL_CASE>
+
+	<SQL_CASE>		
+		<DISCONNECT>1</DISCONNECT><!-- 默认断开连接，可以不用写 -->
+	</SQL_CASE>
+	<SQL_CASE>
+		<DISCONNECT>0</DISCONNECT><!-- 默认断开连接，可以不用写 -->
+	</SQL_CASE>
+</SQLTEST>

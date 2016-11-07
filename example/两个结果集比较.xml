@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+	1		编写			创建			孙峰		2008-4-11						
+-->
+<!--
+	测试点列表
+	1.		
+-->
+<SQLTEST>
+	<CONTENT> 结果集比较--这个方办只适合结果集行数为一行的情况，如果有多行，那请使用异构数据库结果集比较的办法 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<!-- +++++++++++++++++++++ 测试点1：开始 +++++++++++++++++++++ -->
+	<SQL_CASE><!-- 如果结果集只有一行一列 -->
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE>
+		<SQL> DROP TABLE T1 CASCADE; </SQL>
+		<SQL> DROP TABLE T2 CASCADE; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE>
+		<SQL> CREATE TABLE T1(C INT PRIMARY KEY, C1 INT) </SQL>
+		<SQL> CREATE TABLE T2(C INT PRIMARY KEY, C1 INT) </SQL>
+		<SQL> INSERT INTO T1(C, C1) VALUES(1, 1) </SQL>
+		<SQL> INSERT INTO T2(C, C1) VALUES(1, 1) </SQL>
+		<!-- 下面开始比较结果集 -->
+		<SQLSTR>FromSql:SELECT COUNT(*) FROM T1</SQLSTR><!-- 先把第一个表的结果查出来，保存到替代符里面去 -->
+		<TEMPSTR>FromSql:SELECT COUNT(*) FROM T2</TEMPSTR><!-- 先把第一个表的结果查出来，保存到替代符里面去 -->
+		<IF>BOOL:@SQLSTR=@TEMPSTR</IF>
+		<SMES>两个结果集行数一致</SMES>
+		<ELSE>
+			<FMES>两个表中的行数不一样</FMES>
+		</ELSE>
+	</SQL_CASE>
+	<SQL_CASE>
+		<TYPE> DIRECT_EXECUTE_IGNORE </TYPE>
+		<SQL> DROP TABLE T1 CASCADE; </SQL>
+		<SQL> DROP TABLE T2 CASCADE; </SQL>
+		<TYPE> DIRECT_EXECUTE_SUCCESS </TYPE>
+		<SQL> CREATE TABLE T1(C INT PRIMARY KEY, C1 INT) </SQL>
+		<SQL> CREATE TABLE T2(C INT PRIMARY KEY, C1 INT) </SQL>
+		<SQL> INSERT INTO T1(C, C1) VALUES(1, 1) </SQL>
+		<SQL> INSERT INTO T2(C, C1) VALUES(1, 1) </SQL>
+		<!-- 下面开始比较结果集 -->
+		<SQL_CASE><!-- 先把第一个表的结果查出来，保存到替代符里面去 -->
+			<SQL> SELECT C, C1 FROM T1; </SQL><!-- 注意：如果要打开多个结果集的情况下，列名最好使用自定义的别名，以免两个结果集的列名重名了 -->
+			<OPEN><!-- 打开这个结果集 -->
+				<FETCHNEXT></FETCHNEXT><!-- 获取第一行，存到以列名为替代符名的替代符里，这里分别是存到了@c, @c1里面 -->
+			</OPEN>
+		</SQL_CASE>
+		<SQL_CASE><!-- 把上面获取到的值，用来比较第二个结果集，看是否是一致 -->
+			<TYPE> DIRECT_EXECUTE_SELECT_COMPARE_RESULT </TYPE>
+			<SQL> SELECT C, C1 FROM T2; </SQL>
+			<RESULT>
+				<RECORD>
+					<COLUMN>@C</COLUMN><COLUMN>@C1</COLUMN><!-- 这里指定的值就是上面保存的值了 -->
+				</RECORD>
+			</RESULT>
+		</SQL_CASE>
+	</SQL_CASE>
+	<!-- - - - - - - - - - - - 测试点1：结束 - - - - - - - - - - - -->
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<!--
+	修改记录列表
+	序号		修改类型		修改内容		修改人		修改日期
+																	
+-->
+<!--
+	测试点列表
+	1.		
+-->
+<SQLTEST>
+	<CONTENT> 禁用或启用连接池功能 </CONTENT><!-- 请在这里加入对脚本的简要描述 -->
+	<POOL>TRUE</POOL><!-- 启用连接池，如果填FALSE，则是禁用连接池。默认是禁用连接池的 -->
+	<CONNECT></CONNECT><!-- 连接数据库 -->
+	<SQL_CASE>
+		<SQL> select 1 </SQL>		
+	</SQL_CASE>
+	<DISCONNECT></DISCONNECT>
+	<POOL>TRUE</POOL><!-- 启用连接池，如果填FALSE，则是禁用连接池。默认是禁用连接池的 -->
+	<CONNECT></CONNECT><!-- 这个连接就会重用上一个连接 -->
+	<DISCONNECT></DISCONNECT>
+	<CLEAR><!-- 脚本清除模块，该关键字标识清除块开始 -->
+		<SQL_CASE>
+			
+		</SQL_CASE>
+	</CLEAR>
+</SQLTEST> 
