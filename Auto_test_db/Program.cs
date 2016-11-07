@@ -15,6 +15,7 @@ namespace Auto_test_db
         static void Main()
         {
             Application.EnableVisualStyles();
+            Console.WriteLine("haha");
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());
         }
